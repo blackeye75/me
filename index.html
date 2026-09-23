@@ -41,6 +41,7 @@
   <!-- Rail: vertical on desktop, a top bar on phones. Its colours follow the panel underneath. -->
   <header class="rail" data-rail>
     <span class="rail-progress" data-progress aria-hidden="true"></span>
+    <span class="rail-progress-tip" data-progress-tip aria-hidden="true"></span>
     <a class="rail-logo" href="#top" data-goto="top" aria-label="Priyanshu Raj, back to the start">PR</a>
     <button class="rail-menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-menu-btn>
       <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
@@ -82,6 +83,7 @@
           <!-- Hero: also the intro. The years roll up to today, then the name rises in. -->
           <section class="panel panel--hero" id="top" data-panel data-hero data-rail-bg="#3a3632" data-rail-fg="#f3eee8" data-rail-line="#5a524d" aria-label="Introduction">
             <div class="hero-base" data-hero-base aria-hidden="true"></div>
+            <div class="hero-glow" data-hero-glow aria-hidden="true"></div>
             <div class="hero-year" aria-hidden="true">
               <div class="hero-year-row" data-year-row>
                 <div class="hero-year-strip" data-years><span class="hero-year-cell" data-year-first>2016</span><span class="hero-year-cell">2017</span><span class="hero-year-cell">2018</span><span class="hero-year-cell">2019</span><span class="hero-year-cell">2020</span><span class="hero-year-cell">2021</span><span class="hero-year-cell">2022</span><span class="hero-year-cell">2023</span><span class="hero-year-cell">2024</span><span class="hero-year-cell">2025</span><span class="hero-year-cell">2026</span></div>
@@ -128,14 +130,10 @@
           <section class="panel panel--mw" id="the-work" data-panel data-mw data-rail-bg="#faf9f6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac" aria-label="The work">
             <div class="mw-reveal" data-mw-rect aria-hidden="true">
               <div class="mw-inner" data-mw-inner>
-                <div class="mw-collage">
-                    <span class="cover cover--dash"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-kpis"><i></i><i></i><i></i></span><span class="cv-chart"><i style="--h:38%"></i><i style="--h:52%"></i><i style="--h:44%"></i><i style="--h:70%"></i><i style="--h:58%"></i><i style="--h:82%"></i><i style="--h:66%"></i><i style="--h:92%"></i><i style="--h:74%"></i><i style="--h:88%"></i></span><span class="cv-rows"><i></i><i></i><i></i></span></span></span>
-                    <span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b>$ tidepool api.log --where level=error</b><span><em>12:04:31</em> <s>ERROR</s> payment timeout id=8f2c</span><span><em>12:04:33</em> <u>WARN</u> retry 2/3 id=8f2c</span><span><em>12:04:35</em> INFO settled id=8f2c 212ms</span><span><em>12:05:02</em> <s>ERROR</s> card declined id=91ab</span><b class="cv-cursor">_</b></span></span></span>
-                    <span class="cover cover--shop"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-nav"><i></i><i></i></span><span class="cv-grid"><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span></span><span class="cv-rows"><i></i><i></i></span></span></span>
-                    <span class="cover cover--board"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-canvas"><span class="cv-node" style="--x:8%;--y:18%">Client</span><span class="cv-node" style="--x:40%;--y:50%">Relay</span><span class="cv-node" style="--x:72%;--y:18%">Store</span><span class="cv-edge" style="--x:24%;--y:34%;--w:20%;--r:32deg"></span><span class="cv-edge" style="--x:56%;--y:52%;--w:20%;--r:-32deg"></span><span class="cv-cursor-tag" style="--x:62%;--y:70%">Ana</span><span class="cv-cursor-tag cv-cursor-tag--b" style="--x:20%;--y:66%">Sam</span></span></span></span>
-                    <span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query">how do we rotate API keys?</span><span class="cv-result"><i></i><i></i><i></i><b>RFC-112</b></span><span class="cv-result"><i></i><i></i><i></i><b>OPS-481</b></span><span class="cv-result"><i></i><i></i><i></i><b>wiki</b></span></span></span>
-                    <p class="mw-caption">Five projects · 2024 — 2026</p>
-                  </div>
+                <video class="mw-video" poster="assets/video/work-reel-poster.jpg" autoplay muted loop playsinline preload="auto" data-mw-video>
+                  <source src="assets/video/work-reel.webm" type="video/webm">
+                  <source src="assets/video/work-reel.mp4" type="video/mp4">
+                </video>
               </div>
             </div>
             <div class="mw-row">

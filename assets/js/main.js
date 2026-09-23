@@ -15,6 +15,10 @@
   const motion = hasGsap && !reduce;
 
   if (!hasGsap) root.classList.remove('has-h', 'motion', 'is-intro');
+
+  // The work reel loops on its own; hold it still for visitors who prefer less motion.
+  const reel = $('[data-mw-video]');
+  if (reel && reduce) { reel.removeAttribute('autoplay'); reel.pause(); }
   root.classList.add('motion-ready');
 
   /* ------------------------------------------------------------------
@@ -246,17 +250,22 @@
 
       build();
       rebuild = build;
-      let lastWidth = innerWidth;
+      // Rebuild whenever the visible width or height changes, including when a
+      // scrollbar appears or disappears (that doesn't fire a resize event).
+      let lastWidth = pin.clientWidth;
       let lastHeight = innerHeight;
       const onResize = debounce(() => {
-        if (innerWidth === lastWidth && Math.abs(innerHeight - lastHeight) < 2) return;
-        lastWidth = innerWidth;
+        if (pin.clientWidth === lastWidth && Math.abs(innerHeight - lastHeight) < 2) return;
+        lastWidth = pin.clientWidth;
         lastHeight = innerHeight;
         build();
       }, 150);
       addEventListener('resize', onResize);
+      const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(onResize) : null;
+      observer?.observe(document.body);
 
       return () => {
+        observer?.disconnect();
         removeEventListener('resize', onResize);
         rebuild = () => {};
         hST?.kill(true);
@@ -324,6 +333,7 @@
   const rail = $('[data-rail]');
   const panels = $$('[data-panel]');
   const progress = $('[data-progress]');
+  const progressTip = $('[data-progress-tip]');
   const workList = $('[data-work-list]');
   let railPanel = null;
   let railDark = null;
@@ -364,6 +374,12 @@
     const max = document.documentElement.scrollHeight - innerHeight;
     const p = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
     progress.style.transform = desktop ? `scaleY(${p})` : `scaleX(${p})`;
+    if (progressTip) {
+      progressTip.style.transform = desktop
+        ? `translate3d(-50%, calc(${p * rail.clientHeight}px - 50%), 0)`
+        : `translate3d(calc(${p * rail.clientWidth}px - 50%), 50%, 0)`;
+      progressTip.classList.toggle('is-on', p > 0.002);
+    }
 
     // The strip can move under a still cursor: keep the work hover in sync.
     if (pointer && desktop && workList && !menuIsOpen) {
@@ -399,6 +415,7 @@
     const firstYear = $('[data-year-first]');
     const yearRow = $('[data-year-row]');
     const base = $('[data-hero-base]');
+    const glow = $('[data-hero-glow]');
     const nameEl = $('[data-hero-name]');
     const words = $$('[data-name-word]');
     const tagline = $('[data-hero-tagline]');
@@ -424,6 +441,11 @@
     const roll = 2.85 * n;
     tl.to(strip, { yPercent: (-100 * (cells - 1)) / cells, duration: roll, ease: 'power4.inOut' }, startDone);
     tl.to(base, { scaleX: 1, duration: roll, ease: 'power4.inOut' }, startDone);
+    if (glow) {
+      tl.fromTo(glow, { left: '0%', opacity: 0 }, { opacity: 1, duration: 0.4, ease: 'power2.out' }, startDone);
+      tl.to(glow, { left: '100%', duration: roll, ease: 'power4.inOut' }, startDone);
+      tl.to(glow, { opacity: 0, duration: 0.5, ease: 'power2.out' }, startDone + roll - 0.1);
+    }
 
     const handoff = startDone + roll - 0.42 * n;
     tl.to(yearRow, { yPercent: -100, duration: 1.78 * n, ease: 'power4.inOut' }, handoff);

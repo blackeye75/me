@@ -23,6 +23,8 @@
   --night-fg: #cccccc;
   --progress: #8a8178;
   --accent: #b4582f;   /* focus rings and small highlights */
+  --glow: #e8a36a;     /* warm glow at the end of the loading bars */
+  --glow-core: #fff1de;
 
   --serif: "Instrument Serif", "Times New Roman", Times, serif;
   --sans: "Geist", "Helvetica Neue", Arial, sans-serif;
@@ -50,9 +52,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; background: var(--hero-bg); }
+/* Keep the scrollbar's space reserved, so locking the scroll never changes the page width. */
+html { -webkit-text-size-adjust: 100%; background: var(--hero-bg); scrollbar-gutter: stable; }
 html.lenis, html.lenis body { height: auto; }
-.lenis.lenis-stopped { overflow: clip; }
+.lenis.lenis-stopped { overflow: hidden; }
 .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
 
 body {
@@ -143,11 +146,34 @@ code { font-family: var(--mono); font-size: .9em; }
   bottom: -1px;
   width: 100%;
   height: 2px;
-  background: var(--progress);
+  background: linear-gradient(90deg, var(--progress) 0 70%, var(--glow) 100%);
   transform: scaleX(0);
   transform-origin: left;
   pointer-events: none;
 }
+/* Glowing tip that rides the end of the progress bar */
+.rail-progress-tip {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  bottom: -1px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--glow-core);
+  box-shadow:
+    0 0 6px 2px rgba(255, 196, 128, .95),
+    0 0 16px 6px rgba(232, 140, 70, .6),
+    0 0 36px 12px rgba(232, 140, 70, .25);
+  opacity: 0;
+  transition: opacity .4s ease-out;
+  pointer-events: none;
+}
+.rail-progress-tip.is-on { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .rail-progress-tip.is-on { animation: tip-pulse 2.4s ease-in-out infinite; }
+}
+@keyframes tip-pulse { 50% { opacity: .65; } }
 
 @media (min-width: 768px) {
   .rail {
@@ -201,9 +227,11 @@ code { font-family: var(--mono); font-size: .9em; }
     bottom: auto;
     width: max(2px, calc(.3 * var(--s)));
     height: 100%;
+    background: linear-gradient(180deg, var(--progress) 0 70%, var(--glow) 100%);
     transform: scaleY(0);
     transform-origin: top;
   }
+  .rail-progress-tip { top: 0; bottom: auto; left: calc(max(2px, calc(.3 * var(--s))) / 2); }
 }
 
 /* During the intro the rail is see-through and fades in */
@@ -215,7 +243,7 @@ code { font-family: var(--mono); font-size: .9em; }
 
 .menu { position: fixed; inset: 0; z-index: 55; visibility: hidden; }
 .menu.is-open { visibility: visible; }
-.menu-open body { overflow: hidden; }
+.menu-open { overflow: hidden; }
 
 .menu-panel {
   position: absolute;
@@ -320,7 +348,7 @@ html:not(.motion) .menu.is-open .menu-panel { clip-path: none; }
   background: var(--hero-bg);
   color: var(--hero-fg);
 }
-.is-intro body { overflow: hidden; }
+.is-intro { overflow: hidden; }
 
 /* The loading bar along the bottom that grows into the hero background */
 .hero-base {
@@ -334,6 +362,35 @@ html:not(.motion) .menu.is-open .menu-panel { clip-path: none; }
   transform-origin: 0 100%;
 }
 .is-intro .hero-base { height: 8px; transform: scaleX(0); }
+
+/* Glowing head that leads the intro bar */
+.hero-glow {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: 0;
+  width: 160px;
+  height: 8px;
+  margin-left: -160px;
+  background: linear-gradient(90deg, rgba(232, 163, 106, 0), rgba(255, 214, 170, .85));
+  opacity: 0;
+  pointer-events: none;
+}
+.hero-glow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--glow-core);
+  box-shadow:
+    0 0 8px 3px rgba(255, 200, 140, .95),
+    0 0 24px 10px rgba(232, 140, 70, .6),
+    0 0 60px 20px rgba(232, 140, 70, .25);
+  transform: translateY(-50%);
+}
 
 .hero-year,
 .hero-name {
@@ -486,27 +543,14 @@ html:not(.motion) .menu.is-open .menu-panel { clip-path: none; }
   clip-path: inset(calc(50% - 6.5 * var(--s)) calc(50% - 11 * var(--s)));
 }
 .mw-inner { position: absolute; inset: 0; transform-origin: 50% 50%; }
-.mw-collage {
+.mw-video {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-auto-rows: min-content;
-  align-content: center;
-  gap: 3vw;
-  padding: 0 8vw 0 calc(var(--rail) + 8vw);
-}
-.mw-collage .cover:nth-child(2) { transform: translateY(-2.5vw); }
-.mw-collage .cover:nth-child(4) { transform: translateX(8vw); }
-.mw-collage .cover:nth-child(5) { transform: translate(8vw, 2vw); }
-.mw-caption {
-  position: absolute;
-  right: 8vw;
-  bottom: 6vh;
-  color: #8a8178;
-  font: 400 12px var(--mono);
-  text-transform: uppercase;
-  letter-spacing: .04em;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--hero-bg);
 }
 
 /* Words sit either side of an empty slot the same size as the closed window,
@@ -996,7 +1040,7 @@ html:not(.motion-ready) .svc:hover .svc-bg { opacity: 1; }
   color: var(--ink);
 }
 .case::backdrop { background: transparent; }
-.case-open body { overflow: hidden; }
+.case-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: no-preference) {
   .case[open] { animation: case-in .9s cubic-bezier(.76, 0, .24, 1); }

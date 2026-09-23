@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Work reel</title>
+<!-- Source for assets/video/work-reel.mp4. Edit the projects list below, then run render.mjs. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300..600&family=Geist+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<style>
+  :root {
+    --serif: "Instrument Serif", "Times New Roman", serif;
+    --sans: "Geist", Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1600px; height: 900px; overflow: hidden; background: #262220; scrollbar-gutter: auto; }
+  .scene {
+    position: absolute; inset: 0; overflow: hidden;
+    background: radial-gradient(120% 90% at 70% 45%, #3a3632 0%, #262220 70%);
+    color: #f3eee8; font-family: var(--sans);
+  }
+  .meta { position: absolute; top: 130px; left: 200px; display: flex; gap: 48px; font: 400 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: #a39a8f; }
+  .meta b { color: #f3eee8; font-weight: 400; }
+  .corner { position: absolute; top: 130px; right: 170px; font: 400 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: #a39a8f; }
+  .title-mask { position: absolute; left: 192px; bottom: 160px; overflow: hidden; padding-bottom: 8px; }
+  .title { display: block; font: 400 160px/.9 var(--serif); text-transform: uppercase; letter-spacing: -.01em; }
+  .stack { position: absolute; left: 200px; bottom: 124px; font: 400 15px/1 var(--mono); text-transform: uppercase; letter-spacing: .06em; color: #a39a8f; }
+  .shot { position: absolute; right: 170px; top: 160px; width: 620px; }
+  .shot .cover { width: 100%; border-radius: 10px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.7); }
+  .bar { position: absolute; left: 0; bottom: 0; height: 4px; background: #8a8178; }
+  .bar::after { content: ""; position: absolute; right: -6px; top: 50%; width: 12px; height: 12px; border-radius: 50%; transform: translateY(-50%);
+    background: #fff1de; box-shadow: 0 0 8px 3px rgba(255,200,140,.95), 0 0 24px 10px rgba(232,140,70,.55); }
+  /* animated pieces */
+  .cv-term > * { white-space: nowrap; overflow: hidden; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+const projects = [
+  { name: 'Ledgerline', kind: 'Fintech', year: 2026, stack: 'TypeScript · Go · Kafka', cover: 'dash' },
+  { name: 'Tidepool', kind: 'Developer tools', year: 2025, stack: 'Rust · Tokio · Ratatui', cover: 'term' },
+  { name: 'Kiln', kind: 'E-commerce', year: 2025, stack: 'Astro · Cloudflare Workers', cover: 'shop' },
+  { name: 'Relay', kind: 'Collaboration', year: 2024, stack: 'TypeScript · Yjs · Canvas', cover: 'board' },
+  { name: 'Fieldnote', kind: 'AI search', year: 2024, stack: 'Python · FastAPI · pgvector', cover: 'search' },
+];
+const covers = {
+  dash: `<span class="cover cover--dash"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-kpis"><i></i><i></i><i></i></span><span class="cv-chart">${[38,52,44,70,58,82,66,92,74,88].map(h=>`<i data-h="${h}" style="--h:0%"></i>`).join('')}</span><span class="cv-rows"><i></i><i></i><i></i></span></span></span>`,
+  term: `<span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b data-type>$ tidepool api.log --where level=error</b><span data-type><em>12:04:31</em> <s>ERROR</s> payment timeout id=8f2c</span><span data-type><em>12:04:33</em> <u>WARN</u> retry 2/3 id=8f2c</span><span data-type><em>12:04:35</em> INFO settled id=8f2c 212ms</span><span data-type><em>12:05:02</em> <s>ERROR</s> card declined id=91ab</span><span data-type><em>12:05:09</em> INFO refund queued id=91ab</span><b class="cv-cursor" data-cursor>_</b></span></span></span>`,
+  shop: `<span class="cover cover--shop"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-nav"><i></i><i></i></span><span class="cv-grid"><span class="cv-tile" data-pop><i></i></span><span class="cv-tile" data-pop><i></i></span><span class="cv-tile" data-pop><i></i></span></span><span class="cv-rows"><i></i><i></i></span></span></span>`,
+  board: `<span class="cover cover--board"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-canvas"><span class="cv-node" data-pop style="--x:8%;--y:18%">Client</span><span class="cv-node" data-pop style="--x:40%;--y:50%">Relay</span><span class="cv-node" data-pop style="--x:72%;--y:18%">Store</span><span class="cv-edge" data-draw style="--x:24%;--y:34%;--w:20%;--r:32deg"></span><span class="cv-edge" data-draw style="--x:56%;--y:52%;--w:20%;--r:-32deg"></span><span class="cv-cursor-tag" data-walk="62,70,48,30" style="--x:62%;--y:70%">Ana</span><span class="cv-cursor-tag cv-cursor-tag--b" data-walk="20,66,30,44" style="--x:20%;--y:66%">Sam</span></span></span></span>`,
+  search: `<span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query" data-query="how do we rotate API keys?"></span><span class="cv-result" data-slide><i></i><i></i><i></i><b>RFC-112</b></span><span class="cv-result" data-slide><i></i><i></i><i></i><b>OPS-481</b></span><span class="cv-result" data-slide><i></i><i></i><i></i><b>wiki</b></span></span></span>`,
+};
+
+const D = 2.4;          // seconds per project
+const WIPE = 0.6;       // wipe-in length
+const TOTAL = D * projects.length;
+const stage = document.getElementById('stage');
+const scenes = [];
+
+// Five scenes plus a copy of the first one, which wipes in at the end so the loop is seamless.
+[...projects, projects[0]].forEach((p, i) => {
+  const idx = i % projects.length;
+  const el = document.createElement('div');
+  el.className = 'scene';
+  el.innerHTML = `
+    <div class="meta"><span><b>${String(idx + 1).padStart(2, '0')}</b> / 05</span><span>${p.kind} · ${p.year}</span></div>
+    <div class="corner">Selected work — 2024 · 2026</div>
+    <div class="shot">${covers[p.cover]}</div>
+    <div class="title-mask"><span class="title">${p.name}</span></div>
+    <div class="stack">${p.stack}</div>
+    `;
+  stage.appendChild(el);
+  scenes.push({ el, start: i * D, idx });
+});
+
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const outCubic = (t) => 1 - Math.pow(1 - t, 3);
+const inOutCubic = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const outBack = (t) => { const c = 1.4; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+
+function renderScene(s, lt) {
+  const el = s.el;
+  // Wipe in from the left, like the site's sideways scroll.
+  const w = clamp((lt + WIPE) / WIPE);
+  el.style.clipPath = `inset(0 ${(1 - inOutCubic(w)) * 100}% 0 0)`;
+  el.style.zIndex = String(10 + scenes.indexOf(s));
+  const t = Math.max(0, lt);
+
+  const title = el.querySelector('.title');
+  title.style.transform = `translateY(${(1 - outCubic(clamp((t - 0.1) / 0.9))) * 110}%)`;
+  const shot = el.querySelector('.shot');
+  const k = outCubic(clamp(t / D));
+  shot.style.transform = `translateX(${(1 - k) * 60}px) scale(${1.06 - 0.06 * k})`;
+
+  el.querySelectorAll('.cv-chart i').forEach((bar, j) => {
+    const g = outCubic(clamp((t - 0.25 - j * 0.07) / 0.7));
+    bar.style.setProperty('--h', `${bar.dataset.h * g}%`);
+  });
+  el.querySelectorAll('[data-type]').forEach((line, j) => {
+    const g = clamp((t - 0.2 - j * 0.3) / 0.35);
+    line.style.clipPath = `inset(0 ${(1 - g) * 100}% 0 0)`;
+  });
+  const cursor = el.querySelector('[data-cursor]');
+  if (cursor) cursor.style.opacity = Math.floor(t * 2.5) % 2 ? '0' : '1';
+  el.querySelectorAll('[data-pop]').forEach((node, j) => {
+    const g = clamp((t - 0.2 - j * 0.16) / 0.5);
+    node.style.opacity = String(clamp(g * 2));
+    node.style.transform = `scale(${0.6 + 0.4 * outBack(g)})`;
+  });
+  el.querySelectorAll('[data-draw]').forEach((edge, j) => {
+    const g = outCubic(clamp((t - 0.8 - j * 0.2) / 0.5));
+    edge.style.width = `calc(var(--w) * ${g})`;
+  });
+  el.querySelectorAll('[data-walk]').forEach((tag) => {
+    const [x1, y1, x2, y2] = tag.dataset.walk.split(',').map(Number);
+    const g = inOutCubic(clamp((t - 0.9) / 1.3));
+    tag.style.setProperty('--x', `${x1 + (x2 - x1) * g}%`);
+    tag.style.setProperty('--y', `${y1 + (y2 - y1) * g}%`);
+  });
+  const q = el.querySelector('[data-query]');
+  if (q) {
+    const text = q.dataset.query;
+    const n = Math.floor(clamp((t - 0.2) / 0.9) * text.length);
+    q.textContent = text.slice(0, n) + (Math.floor(t * 2.5) % 2 ? ' ' : '|');
+  }
+  el.querySelectorAll('[data-slide]').forEach((row, j) => {
+    const g = outCubic(clamp((t - 1.1 - j * 0.15) / 0.5));
+    row.style.opacity = String(g);
+    row.style.transform = `translateY(${(1 - g) * 24}px)`;
+  });
+}
+
+window.render = (time) => {
+  scenes.forEach((s) => {
+    const lt = time - s.start;
+    const visible = lt > -WIPE && (lt < D + 0.05 || s === scenes[scenes.length - 1]);
+    s.el.style.display = visible ? 'block' : 'none';
+    if (visible) renderScene(s, lt);
+  });
+};
+window.TOTAL = TOTAL;
+render(0);
+</script>
+</body>
+</html>

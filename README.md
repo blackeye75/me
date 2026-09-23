@@ -33,6 +33,8 @@ index.html            All page content, including the five case studies
 assets/css/style.css  Palette, layout, panels, CSS-drawn project thumbnails, case studies
 assets/js/main.js     Horizontal story, reveals, intro, hover effects, rail, menu, case studies
 404.html              Standalone "page not found" page
+assets/video/         Work reel (WebM and MP4) and its poster frame
+tools/reel/           Source and render script for the work reel
 favicon.svg           PR monogram
 robots.txt            Allows all crawlers
 ```
@@ -64,6 +66,10 @@ Each project has two parts that share an id (for example `kiln`):
 2. **A case study dialog:** `<dialog class="case" id="kiln">`, containing the problem, approach, key decisions, a code excerpt and outcome metrics.
 
 Update the `NN / 05` counter and the "Next project" button (`data-open="…"`) in each dialog so the projects link in a loop. Links like `yoursite.com/#kiln` open that case study directly.
+
+### The work reel
+
+The video inside "The Work" window is `assets/video/work-reel.webm` with an `.mp4` fallback (12 seconds, under 400 KB each), and `work-reel-poster.jpg` as its still frame. It is drawn from `tools/reel/reel.html`: edit the `projects` list there, then run `node tools/reel/render.mjs` (needs Playwright and ffmpeg) to render a new one. You can also drop in any other video; it fills the window with `object-fit: cover`, so keep text away from the edges.
 
 ### Thumbnails
 
