@@ -1,0 +1,80 @@
+/* Chapter V: a darkroom. Two copies of the same composition: a red-lit
+   negative on top of a paper print. Scrolling focuses the logo, turns it like
+   a gear, tightens the lettering and opens a circular aperture onto the print. */
+
+.darkroom {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #120d0c;
+}
+.layer { position: absolute; inset: 0; overflow: hidden; }
+.neg {
+  --glow: .45;
+  --dr-blur: 0px;
+  background:
+    radial-gradient(60% 55% at 50% 50%, rgba(170, 40, 28, var(--glow)), transparent 72%),
+    #120d0c;
+  color: #e0584a;
+}
+.print { background: var(--paper); color: var(--ink); }
+:global(.motion) .neg { --dr-blur: 10px; }
+:global(.motion) .print { clip-path: circle(0px at 50% 50%); }
+
+.chapter { position: absolute; top: calc(var(--bar) + 24px); left: 20px; }
+.meta {
+  position: absolute;
+  margin: 0;
+  font: 400 11px/1.35 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+}
+.neg .meta { color: #a3483d; }
+.print .meta { color: var(--ink-muted); }
+.time { top: calc(var(--bar) + 24px); right: 20px; }
+.stop { bottom: 24px; left: 20px; }
+.note { bottom: 24px; right: 20px; text-align: right; }
+
+.title { margin: 0; font-weight: 400; }
+.word {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  display: block;
+  font: 400 calc(7.2 * var(--s))/.9 var(--serif);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.wordA { top: 20%; }
+.wordB { bottom: 20%; text-align: right; font-size: calc(5.2 * var(--s)); }
+.line { display: block; overflow: hidden; padding-bottom: .06em; }
+.char { display: inline-block; }
+.track { display: inline-block; letter-spacing: -.01em; }
+
+.logoWrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.logo {
+  --size: min(56vw, 34svh);
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f3eee8;
+}
+.logo img { display: block; width: 88%; height: auto; }
+/* The negative: inverted, tinted by the safelight, out of focus until developed */
+.neg .logo {
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(-40deg) brightness(.75) blur(var(--dr-blur));
+}
+
+@media (min-width: 768px) {
+  .chapter { top: var(--vg); left: calc(var(--rail) + 4rem); }
+  .meta { font-size: max(11px, calc(.9 * var(--s))); }
+  .time { top: var(--vg); right: 64px; }
+  .stop { bottom: var(--vg); left: calc(var(--rail) + 4rem); }
+  .note { bottom: var(--vg); right: 64px; }
+  .word { left: calc(var(--rail) + 4rem); right: 64px; font-size: calc(15 * var(--s)); }
+  .wordA { top: 11vh; }
+  .wordB { bottom: 11vh; font-size: calc(12.5 * var(--s)); }
+  .logo { --size: min(40vh, 26 * var(--s)); width: min(40vh, calc(26 * var(--s))); }
+}

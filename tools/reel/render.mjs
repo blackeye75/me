@@ -1,5 +1,5 @@
-// Renders reel.html to assets/video/work-reel.webm and .mp4 (12 s, 30 fps, 1600x900).
-// Needs: npm i -D playwright   and ffmpeg with libx264 on your PATH.
+// Renders reel.html to public/assets/video/work-reel.webm and .mp4 (12 s, 30 fps, 1600x900).
+// Needs: npx playwright (npm i -D playwright) and ffmpeg with libx264 and libvpx on your PATH.
 // Run from the repository root:   node tools/reel/render.mjs
 import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
@@ -24,11 +24,11 @@ await browser.close();
 
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(fps), '-i', join(frames, 'f%04d.jpg'),
   '-c:v', 'libx264', '-preset', 'slow', '-crf', '24', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-an',
-  'assets/video/work-reel.mp4'], { stdio: 'inherit' });
+  'public/assets/video/work-reel.mp4'], { stdio: 'inherit' });
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(fps), '-i', join(frames, 'f%04d.jpg'),
   '-c:v', 'libvpx-vp9', '-b:v', '0', '-crf', '36', '-row-mt', '1', '-pix_fmt', 'yuv420p', '-an',
-  'assets/video/work-reel.webm'], { stdio: 'inherit' });
+  'public/assets/video/work-reel.webm'], { stdio: 'inherit' });
 execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', join(frames, 'f0048.jpg'), '-q:v', '5',
-  'assets/video/work-reel-poster.jpg'], { stdio: 'inherit' });
+  'public/assets/video/work-reel-poster.jpg'], { stdio: 'inherit' });
 rmSync(frames, { recursive: true, force: true });
-console.log(`Rendered ${count} frames to assets/video/work-reel.webm and .mp4`);
+console.log(`Rendered ${count} frames to public/assets/video/work-reel.webm and .mp4`);

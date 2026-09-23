@@ -1,0 +1,53 @@
+/* Next chapter: the closing panel with contact details. */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 64px;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--night);
+  color: var(--night-fg);
+}
+.top { display: grid; gap: 28px; }
+.title {
+  font: 400 calc(7.6 * var(--s))/.84 var(--serif);
+  text-transform: uppercase;
+  color: #d8d2ca;
+}
+.title br { display: none; }
+.word { display: block; }
+.social { list-style: none; margin: 0; padding: 0; display: flex; gap: 20px; font-size: 13px; }
+.social a { text-decoration: none; }
+.social a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+.bottom { display: grid; gap: 28px; }
+.contact { display: grid; gap: 8px; }
+.contact :global(.label), .sign, .copyright { color: #8a8178; }
+.emailRow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.emailRow :global(.mask) { display: inline-block; }
+.email {
+  font-size: clamp(18px, calc(2 * var(--s)), 30px);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 6px;
+  overflow-wrap: anywhere;
+}
+.copy {
+  font: 400 11px/1 var(--sans);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 8px 12px;
+  border: 1px solid #5a524d;
+  border-radius: 99px;
+  transition: background-color .25s, color .25s;
+}
+.copy:hover { background: var(--night-fg); color: var(--night); }
+
+@media (min-width: 768px) {
+  .top { grid-template-columns: 1fr auto; align-items: start; }
+  .title { font-size: calc(23 * var(--s)); }
+  .bottom { grid-template-columns: 1fr auto auto; align-items: end; gap: var(--vg); }
+  .copyright { text-align: right; }
+}

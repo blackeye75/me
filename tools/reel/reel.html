@@ -5,7 +5,169 @@
 <title>Work reel</title>
 <!-- Source for assets/video/work-reel.mp4. Edit the projects list below, then run render.mjs. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300..600&family=Geist+Mono:wght@400&display=swap">
-<link rel="stylesheet" href="../../assets/css/style.css">
+<style>
+  :root { --serif: "Instrument Serif", serif; --sans: "Geist", Arial, sans-serif; --mono: "Geist Mono", ui-monospace, monospace; }
+/* ==========================================================================
+   Covers — CSS-drawn project thumbnails (no image weight)
+   Each cover sets its own palette, like a photograph would.
+   ========================================================================== */
+
+.cover {
+  --cv-bg: #D6DCFF;
+  --cv-panel: #FFFFFF;
+  --cv-ink: #1B2140;
+  --cv-soft: #E3E7FB;
+  --cv-hi: #2F3CF5;
+  container-type: inline-size;
+  display: block;
+  aspect-ratio: 16 / 10;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 7% 8% 0;          /* % of the cover's width; cqw here would measure the page */
+  border-radius: 6px;
+  background: var(--cv-bg);
+  color: var(--cv-ink);
+}
+.cover i, .cover b, .cover em, .cover s, .cover u { display: block; font-style: normal; text-decoration: none; }
+
+.cv-win {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 3.2cqw;
+  padding: 3.4cqw 4cqw;
+  border-radius: 1.4cqw 1.4cqw 0 0;
+  background: var(--cv-panel);
+  box-shadow: 0 3cqw 6cqw -3cqw rgba(0, 0, 0, .35);
+}
+.cv-bar { display: flex; gap: 1cqw; }
+.cv-bar i { width: 1.6cqw; height: 1.6cqw; border-radius: 50%; background: var(--cv-soft); }
+
+/* Ledgerline: dashboard */
+.cv-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4cqw; }
+.cv-kpis i { height: 7cqw; border-radius: 1cqw; background: var(--cv-soft); }
+.cv-kpis i:first-child { background: var(--cv-hi); }
+.cv-chart {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: 1.4cqw;
+  border-bottom: .3cqw solid var(--cv-soft);
+}
+.cv-chart i { flex: 1; height: var(--h); border-radius: .6cqw .6cqw 0 0; background: var(--cv-hi); }
+.cv-chart i:nth-child(odd) { opacity: .45; }
+.cv-rows { display: grid; gap: 1.6cqw; padding-bottom: 3cqw; }
+.cv-rows i { height: 1.6cqw; border-radius: 1cqw; background: var(--cv-soft); }
+.cv-rows i:nth-child(1) { width: 92%; }
+.cv-rows i:nth-child(2) { width: 74%; }
+.cv-rows i:nth-child(3) { width: 58%; }
+
+/* Tidepool: terminal */
+.cover--term { --cv-bg: #0E3B36; --cv-panel: #071E1B; --cv-ink: #CDEFE6; --cv-soft: #2D5B54; --cv-hi: #6FE3C3; }
+.cv-term {
+  display: grid;
+  gap: .9cqw;
+  font: 400 2.5cqw/1.35 var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cv-term b { color: var(--cv-hi); font-weight: 500; }
+.cv-term em { display: inline; color: var(--cv-soft); }
+.cv-term s { display: inline; color: #FF8A7A; }
+.cv-term u { display: inline; color: #F2C66D; }
+.cv-cursor { animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Kiln: storefront */
+.cover--shop { --cv-bg: #E6D2BE; --cv-panel: #FBF7F1; --cv-ink: #3A2A20; --cv-soft: #EFE4D8; --cv-hi: #B4582F; }
+.cv-nav { display: flex; justify-content: space-between; }
+.cv-nav i { height: 1.8cqw; border-radius: 1cqw; background: var(--cv-soft); }
+.cv-nav i:first-child { width: 16%; background: var(--cv-ink); }
+.cv-nav i:last-child { width: 30%; }
+.cv-grid { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.4cqw; }
+.cv-tile { display: grid; place-items: center; border-radius: 1cqw; background: var(--cv-soft); }
+.cv-tile i {
+  width: 42%;
+  aspect-ratio: 1 / 1.15;
+  border-radius: 42% 42% 30% 30% / 48% 48% 22% 22%;
+  background: var(--cv-hi);
+}
+.cv-tile:nth-child(2) i { background: #6E7F66; width: 34%; aspect-ratio: 1 / 1.45; }
+.cv-tile:nth-child(3) i { background: #D9A441; width: 48%; aspect-ratio: 1 / .8; }
+
+/* Relay: whiteboard */
+.cover--board { --cv-bg: #F2CF5B; --cv-panel: #FFFDF6; --cv-ink: #2B2A26; --cv-soft: #E9E4D2; --cv-hi: #E0572F; }
+.cv-canvas {
+  position: relative;
+  flex: 1;
+  margin-bottom: 3cqw;
+  border-radius: 1cqw;
+  background: radial-gradient(circle, var(--cv-soft) .35cqw, transparent .4cqw) 0 0 / 3cqw 3cqw;
+}
+.cv-node {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  padding: 1.6cqw 2.6cqw;
+  border: .35cqw solid var(--cv-ink);
+  border-radius: 1cqw;
+  background: var(--cv-panel);
+  font: 500 2.4cqw/1 var(--mono);
+}
+.cv-edge {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--w);
+  height: .35cqw;
+  background: var(--cv-ink);
+  transform: rotate(var(--r));
+  transform-origin: left center;
+}
+.cv-cursor-tag {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  padding: .8cqw 1.6cqw;
+  border-radius: 0 1cqw 1cqw 1cqw;
+  background: var(--cv-hi);
+  color: #FFFFFF;
+  font: 500 2cqw/1 var(--mono);
+}
+.cv-cursor-tag--b { background: #2F3CF5; }
+
+/* Fieldnote: search */
+.cover--search { --cv-bg: #26262C; --cv-panel: #34343C; --cv-ink: #E9E9F0; --cv-soft: #4A4A55; --cv-hi: #A5ADFF; }
+.cv-query {
+  padding: 2cqw 3cqw;
+  border: .3cqw solid var(--cv-hi);
+  border-radius: 99px;
+  font: 400 2.6cqw/1 var(--mono);
+  white-space: nowrap;
+  overflow: hidden;
+}
+.cv-result {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1.2cqw 2cqw;
+  padding-bottom: 2cqw;
+  border-bottom: .25cqw solid var(--cv-soft);
+}
+.cv-result i { grid-column: 1; height: 1.6cqw; border-radius: 1cqw; background: var(--cv-soft); }
+.cv-result i:first-child { width: 55%; background: var(--cv-hi); }
+.cv-result i:nth-child(2) { width: 90%; }
+.cv-result i:nth-child(3) { width: 70%; }
+.cv-result b {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  align-self: start;
+  padding: .8cqw 1.4cqw;
+  border: .25cqw solid var(--cv-soft);
+  border-radius: 99px;
+  font: 400 1.8cqw/1 var(--mono);
+  color: var(--cv-hi);
+}
+</style>
 <style>
   :root {
     --serif: "Instrument Serif", "Times New Roman", serif;

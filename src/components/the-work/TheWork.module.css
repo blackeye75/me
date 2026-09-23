@@ -1,0 +1,62 @@
+/* "The Work": a centred window opens until it fills the screen, pushing the words apart. */
+
+.theWork {
+  display: block;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+}
+.reveal {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: var(--hero-bg);
+  clip-path: inset(calc(50% - 6.5 * var(--s)) calc(50% - 11 * var(--s)));
+}
+.inner { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.video {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: var(--hero-bg);
+}
+
+/* Words sit either side of an empty slot the same size as the closed window,
+   so the window is always exactly centred. */
+.row {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+  justify-items: center;
+  row-gap: calc(1.2 * var(--s));
+  pointer-events: none;
+}
+.word {
+  font: 400 calc(4.6 * var(--s))/.9 var(--serif);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.wordA { align-self: end; }
+.wordB { align-self: start; }
+.slot { width: calc(22 * var(--s)); height: calc(13 * var(--s)); }
+
+@media (min-width: 768px) {
+  .reveal { clip-path: inset(calc(50% - 7 * var(--s)) calc(50% - 12.45 * var(--s))); }
+  .row {
+    grid-template-rows: none;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
+    row-gap: 0;
+    column-gap: calc(1.6 * var(--s));
+  }
+  .word { font-size: calc(14 * var(--s)); }
+  .wordA { justify-self: end; align-self: center; }
+  .wordB { justify-self: start; align-self: center; }
+  .slot { width: calc(24.9 * var(--s)); height: calc(14 * var(--s)); }
+}

@@ -1,105 +1,106 @@
-# Folio — developer edition
+# Priyanshu Raj — portfolio
 
-A developer portfolio in plain HTML, CSS and JavaScript, with no build step.
+A horizontal-scroll developer portfolio built with **Next.js 16** (App Router), **React 19** and **TypeScript**.
 
-On desktop the whole page is one horizontal story. Scrolling down moves a pinned strip of full-screen panels sideways. Halfway along, the strip pauses while a small rectangle between the words "The" and "Work" grows to fill the screen, then the journey continues. On phones the same panels stack vertically with the same reveals.
+On desktop the page is one horizontal story. Scrolling moves a pinned strip of full-screen panels sideways. The strip holds still twice: once while a window between "The" and "Work" opens onto the work reel, and once for the darkroom in Chapter V. On phones the same panels stack vertically with the same reveals.
 
-The layout and motion are modelled on [khanhnguyen.design](https://khanhnguyen.design/): chapters, the side rail that changes colour with each panel, line-by-line text reveals and the expanding "The Work" transition. The code, content and fonts here are original or openly licensed.
+The layout and motion are modelled on [khanhnguyen.design](https://khanhnguyen.design/). The code, content and fonts here are original or openly licensed.
 
-## Libraries
+## Getting started
 
-Loaded from CDNs in `index.html`, all free to use:
-
-- [GSAP](https://gsap.com/) 3.13 with ScrollTrigger (pinning, scroll-linked timelines) and SplitText (line reveals)
-- [Lenis](https://lenis.darkroom.engineering/) 1.3 for smooth scrolling (`lerp: 0.085`)
-
-Fonts: Instrument Serif (display), Geist (body) and Geist Mono (labels and code), from Google Fonts.
-
-If the libraries fail to load, the page falls back to a normal vertical layout with everything visible.
-
-## Run it
-
-Open `index.html` in a browser, or serve the folder:
+Requires Node.js 20.9 or later.
 
 ```sh
-python3 -m http.server 8000
-# then visit http://localhost:8000
+npm install
+npm run dev        # http://localhost:3000
 ```
 
-## Files
-
-```
-index.html            All page content, including the five case studies
-assets/css/style.css  Palette, layout, panels, CSS-drawn project thumbnails, case studies
-assets/js/main.js     Horizontal story, reveals, intro, hover effects, rail, menu, case studies
-404.html              Standalone "page not found" page
-assets/img/logo.webp  Logo (portrait head and Chapter V)
-assets/video/         Work reel (WebM and MP4) and its poster frame
-tools/reel/           Source and render script for the work reel
-favicon.svg           PR monogram
-robots.txt            Allows all crawlers
-```
-
-## Make it yours
-
-Everything below is placeholder content. Search `index.html` for each item:
-
-| What | Where |
+| Script | What it does |
 | --- | --- |
-| Name "Priyanshu Raj" and the "PR" monogram | `<title>`, meta tags, hero `<h1>`, rail, footer, `favicon.svg`, `404.html` |
-| Tagline, intro, quote, hobbies | Hero and Chapter I |
-| Years in the intro counter | `.hero-years-strip` (one `<span>` per year) |
-| Location and time zone | `data-timezone="Asia/Kolkata"` on `<main>` (any [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)), plus the "GMT+5:30" and "India" labels |
-| Availability | Hero "Open for collaborations" |
-| Email | `mailto:` link and the `data-copy` value in the footer (currently priyanshuraj22275@gmail.com) |
-| Social links | Menu and footer |
-| Projects | Work list rows in Chapter II and the matching `<dialog class="case">` blocks at the end of `<body>` |
-| Services | Chapter III (`.svc` articles) |
-| Experience | Chapter IV (`.client` rows); each row's `.client-logo` holds the SVG shown on hover |
-| Domain | `canonical`, `og:url` and `og:image` in `<head>` (these must be full `https://` URLs) |
-| Portrait | `.about-portrait`: the logo sits in `.portrait-head`; the body shape is drawn in CSS. Replace the whole `.portrait-ph` with a photo if you prefer |
-| Logo | `assets/img/logo.webp`, used in the portrait and Chapter V |
+| `npm run dev` | Development server with hot reload |
+| `npm run build` | Production build (the page is prerendered as static HTML) |
+| `npm run start` | Serves the production build |
+| `npm run lint` | ESLint (Next.js core web vitals and TypeScript rules) |
+| `npm run typecheck` | TypeScript, no emit |
 
-### Adding or changing a project
+## How it's organised
 
-Each project has two parts that share an id (for example `kiln`):
+```
+src/
+  app/                 Routes: layout (fonts, metadata, boot script), page, 404, icon, robots, sitemap
+  content/             All site content, typed. Edit these files to change what the site says
+  lib/content.ts       getContent(): the one place pages read content from (the CMS seam)
+  components/          One folder per component, each with its own CSS Module
+    story/             The pinned strip and the Panel wrapper every section uses
+    rail/  menu/       Navigation rail and full-screen menu
+    hero/ about/ the-work/ work/ services/ experience/ darkroom/ footer/
+    case-study/        Full-screen case study dialogs and the code block
+    cover/             CSS-drawn project thumbnails
+    copy-email/        The only interactive React component (client)
+    motion/            <Motion />: starts the motion layer after hydration
+  motion/              Scroll and hover motion (GSAP, ScrollTrigger, SplitText, Lenis)
+public/assets/         Logo, experience logos, work reel video
+tools/reel/            Source and render script for the work reel video
+```
 
-1. **A row in the work list:** `<a class="work-link" href="#kiln" data-case="kiln">`, plus a matching `.work-img` preview in the same position inside `.work-preview`.
-2. **A case study dialog:** `<dialog class="case" id="kiln">`, containing the problem, approach, key decisions, a code excerpt and outcome metrics.
+### Components and motion
 
-Update the `NN / 05` counter and the "Next project" button (`data-open="…"`) in each dialog so the projects link in a loop. Links like `yoursite.com/#kiln` open that case study directly.
+Sections are **server components**. They render plain markup from content and mark the moving parts with `data-*` attributes (`data-reveal`, `data-rise`, `data-work-item`, …). The motion layer in `src/motion` finds those attributes after hydration, so components stay simple and the motion can be changed without touching markup.
 
-### The work reel
+`initMotion()` in `src/motion/index.ts` wires everything together and returns a cleanup function that undoes every tween, trigger and listener.
 
-The video inside "The Work" window is `assets/video/work-reel.webm` with an `.mp4` fallback (12 seconds, under 400 KB each), and `work-reel-poster.jpg` as its still frame. It is drawn from `tools/reel/reel.html`: edit the `projects` list there, then run `node tools/reel/render.mjs` (needs Playwright and ffmpeg) to render a new one. You can also drop in any other video; it fills the window with `object-fit: cover`, so keep text away from the edges.
+| Module | Responsibility |
+| --- | --- |
+| `scroll.ts` | Lenis smooth scrolling and scroll locking |
+| `story.ts` | The horizontal strip (desktop) and pinned sections (phones) |
+| `work-window.ts` | "The Work" window opening from the centre |
+| `darkroom.ts` | Chapter V: negative, focus, gear, timer and aperture |
+| `intro.ts` | Years counter, loading bar and name reveal on every load |
+| `reveals.ts` | Line-by-line text reveals per section |
+| `rail.ts` | Rail colours per panel and scroll progress |
+| `menu.ts` | Menu open/close and section navigation |
+| `hovers.ts` | Work previews, experience logos, service backgrounds |
+| `case-studies.ts` | Case study dialogs and `#slug` deep links |
+| `clock.ts` | Live local time |
 
-### Thumbnails
+Visitors who prefer reduced motion get plain sideways scrolling with no smoothing, intro or reveals. If JavaScript doesn't load, the page falls back to a readable vertical layout.
 
-Project thumbnails are drawn with CSS (`.cover--dash`, `--term`, `--shop`, `--board`, `--search`), so they weigh nothing and stay sharp at any size. To use screenshots instead, replace the `<span class="cover …">` markup with an `<img>` that has real `alt` text and explicit `width` and `height`.
+### Styling
 
-### Colours and type
+Global tokens (colours, fonts, the `--s` scale unit) and a few shared utilities live in `src/app/globals.css`. Everything else is a CSS Module next to its component. Sizes use `--s`, which is 1/144 of the viewport width on desktop and 1/39 on phones, so the composition scales with the screen.
 
-Panel colours are tokens at the top of `style.css`. Each panel also carries `data-rail-bg`, `data-rail-fg` and `data-rail-line`, which the rail switches to when that panel is underneath it.
+Fonts are loaded with `next/font`: Instrument Serif (display), Geist (body) and Geist Mono (labels and code).
 
-Sizes use `--s`, which is 1/144 of the viewport width on desktop and 1/39 on phones, so the composition scales with the screen.
+## Editing content
 
-## Motion reference
+All text, links and images come from `src/content`:
 
-| Effect | Where | Timing |
-| --- | --- | --- |
-| Smooth scroll | Lenis | `lerp: 0.085`, `wheelMultiplier: 1.08` |
-| Horizontal story | `main.js`, desktop `matchMedia` block | Pinned, scrubbed, linear. Pauses for one screen height at "The Work" |
-| "The Work" window | Same timeline | A centred window (clip-path) opens from nothing to full screen; the words move with its edges |
-| Line reveals | `revealLines()` | Lines rise from 102% below a mask, 1.7s, `power3.out`, 0.07s stagger |
-| Portrait reveal | `revealImage()` | Colour block wipes in, image slides in 0.2s later, 0.7s, `power2.out` |
-| Work hover | `showWork()` | Preview scales from 0, 0.45s, `power3.out`; other names fade to 25% |
-| Service hover | Chapter III block | Background wipes up, 0.8s, `power3.out`; exits upwards |
-| Darkroom (Chapter V) | Second hold in the story (1.6 screens) | Starts as a red-lit negative. Letters of DARKROOM rise and fall into place, ENGINEERING tightens from wide spacing, the logo turns like a gear while coming into focus, a timer counts to 01:30, then a circular aperture opens onto the print (f/22 to f/2.8) |
-| Intro | Every load | First year rises (1.7s), years roll (2.85s) as a bar fills along the bottom, the year slides away (1.78s) and the name rises word by word (1.7s, 0.2s apart); the bar then grows into the hero background |
-| Menu | Toggle in the rail | Panel wipes open left to right (0.88s, `power3.out`); links rise 0.15s apart; closes right to left |
+| File | Contains |
+| --- | --- |
+| `profile.ts` | Name, tagline, location and time zone, email, socials, logo, intro years, menu |
+| `projects.ts` | Projects and their full case studies (problem, approach, decisions, code, metrics) |
+| `sections.ts` | About, work section, services, experience, darkroom and footer copy |
+| `types.ts` | The content model every file above follows |
 
-Visitors who prefer reduced motion get plain sideways scrolling with no smoothing, no intro and no reveals.
+Line breaks in short copy are written as `\n`. The `slug` of a project is the URL hash that opens its case study (for example `/#kiln`).
 
-## Deploy
+## Adding a CMS (next phase)
 
-Any static host works. For **GitHub Pages**: Settings → Pages → Deploy from a branch → select the branch and `/ (root)`. Netlify, Vercel and Cloudflare Pages also work with no build command and the repository root as the output directory.
+Pages never import content directly. They call `getContent()` in `src/lib/content.ts`, which returns a `SiteContent` object. To connect a CMS:
+
+1. Model the CMS collections on the types in `src/content/types.ts`.
+2. In `getContent()`, fetch from the CMS and map the response to `SiteContent`.
+3. Choose how updates reach the site: time-based revalidation, or on-demand revalidation from a CMS webhook.
+
+No component needs to change.
+
+## The work reel
+
+The video inside "The Work" window is `public/assets/video/work-reel.webm` with an `.mp4` fallback (12 seconds, under 400 KB each) and a poster frame. It is drawn from `tools/reel/reel.html`. Edit the `projects` list there, then run `node tools/reel/render.mjs` from the repository root to render a new one (needs Playwright and ffmpeg with libx264 and libvpx). You can also drop in any other video; it fills the window with `object-fit: cover`, so keep text away from the edges.
+
+## Deploying
+
+Set `NEXT_PUBLIC_SITE_URL` to the site's public address (used for metadata, `robots.txt` and `sitemap.xml`).
+
+- **Vercel**: import the repository; no configuration needed.
+- **Any Node host**: `npm run build && npm run start`.
