@@ -70,7 +70,7 @@
     }
     const tick = () => { const t = format.format(new Date()); clocks.forEach((el) => { el.textContent = t; }); };
     tick();
-    setInterval(tick, 10000);
+    setInterval(tick, 1000);
   }
 
   const copyStatus = $('[data-copy-status]');

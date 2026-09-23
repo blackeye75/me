@@ -48,13 +48,13 @@ Everything below is placeholder content. Search `index.html` for each item:
 | Name "Priyanshu Raj" and the "PR" monogram | `<title>`, meta tags, hero `<h1>`, rail, footer, `favicon.svg`, `404.html` |
 | Tagline, intro, quote, hobbies | Hero and Chapter I |
 | Years in the intro counter | `.hero-years-strip` (one `<span>` per year) |
-| Location and time zone | `data-timezone="Asia/Singapore"` on `<main>` (any [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)), plus the "GMT+8" and "Singapore" labels |
+| Location and time zone | `data-timezone="Asia/Kolkata"` on `<main>` (any [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)), plus the "GMT+5:30" and "India" labels |
 | Availability | Hero "Open for collaborations" |
-| Email | `mailto:` link and the `data-copy` value in the footer |
+| Email | `mailto:` link and the `data-copy` value in the footer (currently priyanshuraj22275@gmail.com) |
 | Social links | Menu and footer |
 | Projects | Work list rows in Chapter II and the matching `<dialog class="case">` blocks at the end of `<body>` |
 | Services | Chapter III (`.svc` articles) |
-| Experience | Chapter IV (`.client` rows) |
+| Experience | Chapter IV (`.client` rows); each row's `.client-logo` holds the SVG shown on hover |
 | Domain | `canonical`, `og:url` and `og:image` in `<head>` (these must be full `https://` URLs) |
 | Portrait | Replace the `.portrait-ph` placeholder inside `.about-portrait` with `<img src="…" alt="Portrait of …">` styled to fill the frame |
 

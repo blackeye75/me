@@ -52,8 +52,10 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-/* Keep the scrollbar's space reserved, so locking the scroll never changes the page width. */
-html { -webkit-text-size-adjust: 100%; background: var(--hero-bg); scrollbar-gutter: stable; }
+/* No visible page scrollbar, like the original. Scrolling still works with wheel, touch and keys,
+   and the page width never changes when the scroll is locked. */
+html { -webkit-text-size-adjust: 100%; background: var(--hero-bg); scrollbar-width: none; }
+html::-webkit-scrollbar { display: none; width: 0; height: 0; }
 html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 .lenis [data-lenis-prevent] { overscroll-behavior: contain; }
@@ -774,6 +776,7 @@ html:not(.motion-ready) .svc:hover .svc-bg { opacity: 1; }
   letter-spacing: -.025em;
 }
 .client-meta { font: 400 11px/1.3 var(--mono); color: var(--ink-muted); text-transform: uppercase; letter-spacing: .02em; }
+.client-logo { display: none; }
 .client--more .client-name { color: #9a938b; }
 
 @media (min-width: 768px) {
@@ -787,6 +790,28 @@ html:not(.motion-ready) .svc:hover .svc-bg { opacity: 1; }
     padding-block: 0;
   }
   .client-meta { opacity: 0; transition: opacity .35s ease-out; }
+
+  /* Hover: a logo tile wipes in from the right, just left of the name */
+  .client { position: relative; }
+  .client-logo {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: 100%;
+    margin-right: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(18.8 * var(--s));
+    aspect-ratio: 188 / 251;
+    background: var(--paper);
+    color: var(--ink);
+    clip-path: inset(0 0 0 100%);
+    transition: clip-path .5s cubic-bezier(.3, .86, .36, .95);
+    pointer-events: none;
+  }
+  .client-logo svg { width: 46%; height: auto; }
+  .clients-list.is-interactive .client:hover .client-logo { clip-path: inset(0 0 0 0); }
   .clients-list.is-interactive .client.is-dim { opacity: .25; }
   .client.is-active .client-meta { opacity: 1; }
 }
