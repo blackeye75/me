@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Jordan Hale · Software Engineer</title>
-  <meta name="description" content="Jordan Hale is an independent software engineer building fast, careful web products, from the database to the last pixel.">
+  <title>Priyanshu Raj · Software Engineer</title>
+  <meta name="description" content="Priyanshu Raj is an independent software engineer building fast, careful web products, from the database to the last pixel.">
   <meta name="theme-color" content="#262220">
   <link rel="canonical" href="https://example.com/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://example.com/">
-  <meta property="og:title" content="Jordan Hale · Software Engineer">
+  <meta property="og:title" content="Priyanshu Raj · Software Engineer">
   <meta property="og:description" content="Independent software engineer building fast, careful web products.">
   <meta property="og:image" content="https://example.com/social-share.png">
   <meta name="twitter:card" content="summary_large_image">
@@ -20,20 +20,16 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300..600&family=Geist+Mono:wght@400&display=swap">
   <link rel="stylesheet" href="assets/css/style.css">
 
-  <!-- Before paint: decide whether the intro plays (once per visit, never with reduced motion). -->
+  <!-- Before paint: set up layout classes and the intro, which plays on every load (not with reduced motion). -->
   <script>
     (function () {
       var root = document.documentElement;
-      root.classList.add('js');
-      root.classList.add('has-h');
-      var calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!calm) root.classList.add('motion');
-      try {
-        if (!calm && !sessionStorage.getItem('folio-intro')) {
-          sessionStorage.setItem('folio-intro', '1');
-          root.classList.add('is-intro');
-        }
-      } catch (e) {}
+      root.classList.add('js', 'has-h');
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        root.classList.add('motion', 'is-intro');
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+      }
       // Safety net: if the scripts fail to load, show everything.
       setTimeout(function () { if (!root.classList.contains('motion-ready')) root.classList.remove('is-intro', 'motion', 'has-h'); }, 4000);
     })();
@@ -44,32 +40,37 @@
 
   <!-- Rail: vertical on desktop, a top bar on phones. Its colours follow the panel underneath. -->
   <header class="rail" data-rail>
-    <button class="rail-menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-menu-btn>
-      <span></span><span></span>
-    </button>
-    <p class="rail-edition">Portfolio — v2026</p>
-    <a class="rail-name" href="#top" data-goto="top">Jordan Hale°</a>
-    <p class="rail-year">© <span data-year>2026</span></p>
     <span class="rail-progress" data-progress aria-hidden="true"></span>
+    <a class="rail-logo" href="#top" data-goto="top" aria-label="Priyanshu Raj, back to the start">PR</a>
+    <button class="rail-menu" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-menu-btn>
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+        <rect y="15" width="32" height="1.5" fill="currentColor"></rect>
+        <rect data-bar="lower" x="0" y="22" width="32" height="1.5" fill="currentColor"></rect>
+        <rect data-bar="upper" x="0" y="8" width="32" height="1.5" fill="currentColor"></rect>
+      </svg>
+    </button>
+    <div class="rail-meta">
+      <p class="rail-edition">Folio — Edition</p>
+      <a class="rail-name" href="#top" data-goto="top">Priyanshu Raj°</a>
+      <p class="rail-year">© <span data-year>2026</span></p>
+    </div>
   </header>
 
-  <div class="menu" id="menu" data-lenis-prevent>
-    <div class="menu-inner">
-      <p class="menu-edition label">Folio — Edition<br>© <span data-year>2026</span></p>
-      <nav aria-label="Main">
-        <ol class="menu-list">
-          <li style="--i:0"><a href="#top" data-goto="top"><span class="menu-num">01.</span><span class="menu-word">Home</span></a></li>
-          <li style="--i:1"><a href="#about" data-goto="about"><span class="menu-num">02.</span><span class="menu-word">About</span></a></li>
-          <li style="--i:2"><a href="#work" data-goto="work"><span class="menu-num">03.</span><span class="menu-word">Work</span></a></li>
-          <li style="--i:3"><a href="#experience" data-goto="experience"><span class="menu-num">04.</span><span class="menu-word">Experience</span></a></li>
-          <li style="--i:4"><a href="#contact" data-goto="contact"><span class="menu-num">05.</span><span class="menu-word">Contact</span></a></li>
-        </ol>
+  <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site navigation" data-lenis-prevent>
+    <div class="menu-panel" data-menu-panel>
+      <button class="menu-close" type="button" data-menu-close><span class="mask"><span data-menu-line>Close</span></span></button>
+      <nav class="menu-nav" aria-label="Main">
+        <a class="menu-item" href="#top" data-goto="top" data-nav="top"><span class="mask menu-num-mask"><span class="menu-num" data-menu-line>01.</span></span><span class="mask"><span class="menu-word" data-menu-line>Home</span></span></a>
+        <a class="menu-item" href="#about" data-goto="about" data-nav="about"><span class="mask menu-num-mask"><span class="menu-num" data-menu-line>02.</span></span><span class="mask"><span class="menu-word" data-menu-line>About</span></span></a>
+        <a class="menu-item" href="#work" data-goto="work" data-nav="work"><span class="mask menu-num-mask"><span class="menu-num" data-menu-line>03.</span></span><span class="mask"><span class="menu-word" data-menu-line>Work</span></span></a>
+        <a class="menu-item" href="#experience" data-goto="experience" data-nav="experience"><span class="mask menu-num-mask"><span class="menu-num" data-menu-line>04.</span></span><span class="mask"><span class="menu-word" data-menu-line>Experience</span></span></a>
+        <a class="menu-item" href="#contact" data-goto="contact" data-nav="contact"><span class="mask menu-num-mask"><span class="menu-num" data-menu-line>05.</span></span><span class="mask"><span class="menu-word" data-menu-line>Contact</span></span></a>
       </nav>
-      <ul class="menu-social">
-        <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
-        <li><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a></li>
-        <li><a href="https://x.com/" target="_blank" rel="noopener">X</a></li>
-      </ul>
+      <div class="menu-social">
+        <span class="mask"><a href="https://github.com/" target="_blank" rel="noopener" data-menu-line data-menu-social>GitHub</a></span>
+        <span class="mask"><a href="https://www.linkedin.com/" target="_blank" rel="noopener" data-menu-line data-menu-social>LinkedIn</a></span>
+        <span class="mask"><a href="https://x.com/" target="_blank" rel="noopener" data-menu-line data-menu-social>X</a></span>
+      </div>
     </div>
   </div>
 
@@ -78,30 +79,23 @@
       <div class="story-pin" data-pin>
         <div class="story-track" data-track>
 
-          <!-- Hero -->
-          <section class="panel panel--hero" id="top" data-panel data-rail-bg="#262220" data-rail-fg="#f3eee8" data-rail-line="#5a524d" aria-label="Introduction">
-            <div class="hero-top">
-              <h1 class="hero-stage">
-                <span class="hero-stack" data-hero-stack>
-                  <span class="hero-years" aria-hidden="true">
-                    <span class="hero-years-strip" data-years>
-                      <span>2016</span><span>2017</span><span>2018</span><span>2019</span><span>2020</span><span>2021</span><span>2022</span><span>2023</span><span>2024</span><span>2025</span><span>2026</span>
-                    </span>
-                  </span>
-                  <span class="hero-name">
-                    <span class="hero-name-line">Jordan</span>
-                    <span class="hero-name-line">Hale</span>
-                  </span>
-                </span>
-              </h1>
-              <p class="hero-tagline" data-hero-text>Independent software engineer based in Singapore, building fast, careful web products from the database to the last pixel.</p>
+          <!-- Hero: also the intro. The years roll up to today, then the name rises in. -->
+          <section class="panel panel--hero" id="top" data-panel data-hero data-rail-bg="#3a3632" data-rail-fg="#f3eee8" data-rail-line="#5a524d" aria-label="Introduction">
+            <div class="hero-base" data-hero-base aria-hidden="true"></div>
+            <div class="hero-year" aria-hidden="true">
+              <div class="hero-year-row" data-year-row>
+                <div class="hero-year-strip" data-years><span class="hero-year-cell" data-year-first>2016</span><span class="hero-year-cell">2017</span><span class="hero-year-cell">2018</span><span class="hero-year-cell">2019</span><span class="hero-year-cell">2020</span><span class="hero-year-cell">2021</span><span class="hero-year-cell">2022</span><span class="hero-year-cell">2023</span><span class="hero-year-cell">2024</span><span class="hero-year-cell">2025</span><span class="hero-year-cell">2026</span></div>
+              </div>
             </div>
-            <div class="hero-bottom">
-              <p class="hero-meta" data-hero-text>Singapore<br>(GMT+8) <span class="mono" data-clock>--:--</span></p>
-              <p class="hero-meta" data-hero-text>Open for<br>collaborations</p>
-              <p class="hero-journey" data-hero-text>Ten years of<br>shipping software</p>
-              <p class="hero-scroll" data-hero-text>Scroll</p>
-            </div>
+            <h1 class="hero-name" data-hero-name>
+              <span class="hero-name-line"><span class="hero-word" data-name-word>Priyanshu</span></span>
+              <span class="hero-name-line"><span class="hero-word" data-name-word>Raj</span></span>
+            </h1>
+            <p class="hero-tagline" data-hero-tagline>Independent software engineer building fast, careful web products, from the database to the last pixel.</p>
+            <p class="hero-journey" data-hero-journey aria-hidden="true">A journey through ten years of code</p>
+            <p class="hero-meta hero-loc" data-hero-meta>Singapore<br>(GMT+8) <span class="mono" data-clock>--:--</span></p>
+            <p class="hero-meta hero-open" data-hero-meta>Open for<br>collaborations</p>
+            <p class="hero-scroll" data-hero-meta>Scroll</p>
           </section>
 
           <!-- Chapter I -->
@@ -113,30 +107,28 @@
             <div class="about-right">
               <div class="about-copy">
                 <h2 class="label" id="about-title" data-about-part>Quick intro</h2>
-                <p class="about-intro" data-about-part>Hi, I’m Jordan. I’m a software engineer with ten years of experience building web products, APIs and developer tools that are fast, accessible and easy to change.</p>
+                <p class="about-intro" data-about-part>Hi, I’m Priyanshu. I’m a software engineer with ten years of experience building web products, APIs and developer tools that are fast, accessible and easy to change.</p>
               </div>
               <div class="about-bottom">
                 <div class="about-quote-col">
                   <p class="about-quote label" data-about-part>“Readable code is a kindness<br>to the next developer.”</p>
-                  <a class="link-arrow" href="#experience" data-goto="experience"><span class="link-text">More about me</span> <span aria-hidden="true">→</span></a>
+                  <a class="link-arrow" href="#experience" data-goto="experience" data-reveal><span class="link-text">More about me</span> <span aria-hidden="true">→</span></a>
                 </div>
                 <figure class="about-portrait" data-image-reveal>
                   <span class="ir-overlay" data-ir-overlay></span>
                   <span class="ir-media" data-ir-media>
-                    <span class="portrait-ph" role="img" aria-label="Portrait placeholder. Replace with your photo."><span aria-hidden="true">JH</span></span>
+                    <span class="portrait-ph" role="img" aria-label="Portrait placeholder. Replace with your photo."><span aria-hidden="true">PR</span></span>
                   </span>
                 </figure>
               </div>
             </div>
           </section>
 
-          <!-- The work: the rectangle grows to fill the screen while the words part -->
+          <!-- The work: a window opens from the centre until it fills the screen, pushing the words apart -->
           <section class="panel panel--mw" id="the-work" data-panel data-mw data-rail-bg="#faf9f6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac" aria-label="The work">
-            <div class="mw-row">
-              <span class="mw-word" data-mw-a>The</span>
-              <div class="mw-rect" data-mw-rect>
-                <div class="mw-inner" data-mw-inner aria-hidden="true">
-                  <div class="mw-collage">
+            <div class="mw-reveal" data-mw-rect aria-hidden="true">
+              <div class="mw-inner" data-mw-inner>
+                <div class="mw-collage">
                     <span class="cover cover--dash"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-kpis"><i></i><i></i><i></i></span><span class="cv-chart"><i style="--h:38%"></i><i style="--h:52%"></i><i style="--h:44%"></i><i style="--h:70%"></i><i style="--h:58%"></i><i style="--h:82%"></i><i style="--h:66%"></i><i style="--h:92%"></i><i style="--h:74%"></i><i style="--h:88%"></i></span><span class="cv-rows"><i></i><i></i><i></i></span></span></span>
                     <span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b>$ tidepool api.log --where level=error</b><span><em>12:04:31</em> <s>ERROR</s> payment timeout id=8f2c</span><span><em>12:04:33</em> <u>WARN</u> retry 2/3 id=8f2c</span><span><em>12:04:35</em> INFO settled id=8f2c 212ms</span><span><em>12:05:02</em> <s>ERROR</s> card declined id=91ab</span><b class="cv-cursor">_</b></span></span></span>
                     <span class="cover cover--shop"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-nav"><i></i><i></i></span><span class="cv-grid"><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span></span><span class="cv-rows"><i></i><i></i></span></span></span>
@@ -144,9 +136,12 @@
                     <span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query">how do we rotate API keys?</span><span class="cv-result"><i></i><i></i><i></i><b>RFC-112</b></span><span class="cv-result"><i></i><i></i><i></i><b>OPS-481</b></span><span class="cv-result"><i></i><i></i><i></i><b>wiki</b></span></span></span>
                     <p class="mw-caption">Five projects · 2024 — 2026</p>
                   </div>
-                </div>
               </div>
-              <span class="mw-word" data-mw-b>Work</span>
+            </div>
+            <div class="mw-row">
+              <span class="mw-word mw-word--a" data-mw-a>The</span>
+              <span class="mw-slot" data-mw-slot aria-hidden="true"></span>
+              <span class="mw-word mw-word--b" data-mw-b>Work</span>
             </div>
           </section>
 
@@ -209,7 +204,7 @@
               </ol>
               <div class="work-foot">
                 <p class="label" data-reveal>❋ Each project opens a full case study</p>
-                <a class="link-arrow" href="#ledgerline" data-case="ledgerline"><span class="link-text">Start reading</span> <span aria-hidden="true">→</span></a>
+                <a class="link-arrow" href="#ledgerline" data-case="ledgerline" data-reveal><span class="link-text">Start reading</span> <span aria-hidden="true">→</span></a>
               </div>
             </div>
           </section>
@@ -225,38 +220,38 @@
             </div>
             <article class="svc" data-svc tabindex="0">
               <div class="svc-bg" data-svc-bg aria-hidden="true"><div class="svc-media" data-svc-media><span class="cover cover--dash"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-kpis"><i></i><i></i><i></i></span><span class="cv-chart"><i style="--h:38%"></i><i style="--h:52%"></i><i style="--h:44%"></i><i style="--h:70%"></i><i style="--h:58%"></i><i style="--h:82%"></i><i style="--h:66%"></i><i style="--h:92%"></i><i style="--h:74%"></i><i style="--h:88%"></i></span><span class="cv-rows"><i></i><i></i><i></i></span></span></span></div></div>
-              <p class="svc-num">01</p>
-              <h3 class="svc-title">Frontend<br>engineering</h3>
+              <p class="svc-num" data-reveal>01</p>
+              <h3 class="svc-title" data-reveal>Frontend<br>engineering</h3>
               <div class="svc-desc">
-                <p>Interfaces that load fast, stay accessible and hold up as the product grows.</p>
-                <p class="svc-tools">React · Next.js · Astro · TypeScript</p>
+                <p data-reveal>Interfaces that load fast, stay accessible and hold up as the product grows.</p>
+                <p class="svc-tools" data-reveal>React · Next.js · Astro · TypeScript</p>
               </div>
             </article>
             <article class="svc" data-svc tabindex="0">
               <div class="svc-bg" data-svc-bg aria-hidden="true"><div class="svc-media" data-svc-media><span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query">GET /v1/payments?status=failed</span><span class="cv-result"><i></i><i></i><i></i><b>200</b></span><span class="cv-result"><i></i><i></i><i></i><b>38 ms</b></span><span class="cv-result"><i></i><i></i><i></i><b>JSON</b></span></span></span></div></div>
-              <p class="svc-num">02</p>
-              <h3 class="svc-title">Backend<br>&amp; APIs</h3>
+              <p class="svc-num" data-reveal>02</p>
+              <h3 class="svc-title" data-reveal>Backend<br>&amp; APIs</h3>
               <div class="svc-desc">
-                <p>Typed, documented services with data models that still make sense a year later.</p>
-                <p class="svc-tools">Go · Node.js · Python · PostgreSQL</p>
+                <p data-reveal>Typed, documented services with data models that still make sense a year later.</p>
+                <p class="svc-tools" data-reveal>Go · Node.js · Python · PostgreSQL</p>
               </div>
             </article>
             <article class="svc" data-svc tabindex="0">
               <div class="svc-bg" data-svc-bg aria-hidden="true"><div class="svc-media" data-svc-media><span class="cover cover--shop"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-nav"><i></i><i></i></span><span class="cv-grid"><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span></span><span class="cv-rows"><i></i><i></i></span></span></span></div></div>
-              <p class="svc-num">03</p>
-              <h3 class="svc-title">Performance<br>&amp; accessibility</h3>
+              <p class="svc-num" data-reveal>03</p>
+              <h3 class="svc-title" data-reveal>Performance<br>&amp; accessibility</h3>
               <div class="svc-desc">
-                <p>Audits and fixes for slow or hard-to-use products, from Core Web Vitals to screen readers.</p>
-                <p class="svc-tools">Lighthouse · axe · WCAG 2.2</p>
+                <p data-reveal>Audits and fixes for slow or hard-to-use products, from Core Web Vitals to screen readers.</p>
+                <p class="svc-tools" data-reveal>Lighthouse · axe · WCAG 2.2</p>
               </div>
             </article>
             <article class="svc" data-svc tabindex="0">
               <div class="svc-bg" data-svc-bg aria-hidden="true"><div class="svc-media" data-svc-media><span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b>$ git push origin main</b><span>✓ lint &nbsp; ✓ test &nbsp; ✓ build</span><span><em>deploy</em> edge · 42 regions</span><span><u>live</u> in 38s</span><b class="cv-cursor">_</b></span></span></span></div></div>
-              <p class="svc-num">04</p>
-              <h3 class="svc-title">Infrastructure<br>&amp; delivery</h3>
+              <p class="svc-num" data-reveal>04</p>
+              <h3 class="svc-title" data-reveal>Infrastructure<br>&amp; delivery</h3>
               <div class="svc-desc">
-                <p>CI pipelines, containers and edge deploys, so shipping on a Friday is uneventful.</p>
-                <p class="svc-tools">Docker · GitHub Actions · Cloudflare · AWS</p>
+                <p data-reveal>CI pipelines, containers and edge deploys, so shipping on a Friday is uneventful.</p>
+                <p class="svc-tools" data-reveal>Docker · GitHub Actions · Cloudflare · AWS</p>
               </div>
             </article>
           </section>
@@ -283,9 +278,9 @@
             <div class="ft-top">
               <h2 class="ft-title" data-ft-title><span class="mask"><span class="ft-word">Next</span></span><br><span class="mask"><span class="ft-word">Chapter</span></span></h2>
               <ul class="ft-social">
-                <li><a href="https://github.com/" target="_blank" rel="noopener">GitHub</a></li>
-                <li><a href="https://www.linkedin.com/" target="_blank" rel="noopener">LinkedIn</a></li>
-                <li><a href="https://x.com/" target="_blank" rel="noopener">X</a></li>
+                <li class="mask"><a href="https://github.com/" target="_blank" rel="noopener" data-ft-line>GitHub</a></li>
+                <li class="mask"><a href="https://www.linkedin.com/" target="_blank" rel="noopener" data-ft-line>LinkedIn</a></li>
+                <li class="mask"><a href="https://x.com/" target="_blank" rel="noopener" data-ft-line>X</a></li>
               </ul>
             </div>
             <div class="ft-bottom">
@@ -296,8 +291,8 @@
                   <span class="sr-only" role="status" data-copy-status></span>
                 </p>
               </div>
-              <p class="label ft-sign">Where ideas become<br>shipped software</p>
-              <p class="label ft-copyright">© <span data-year>2026</span> Jordan Hale<br>Built by hand, no frameworks</p>
+              <p class="label ft-sign" data-reveal>Where ideas become<br>shipped software</p>
+              <p class="label ft-copyright" data-reveal>© <span data-year>2026</span> Priyanshu Raj<br>Built by hand, no frameworks</p>
             </div>
           </footer>
 

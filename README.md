@@ -33,7 +33,7 @@ index.html            All page content, including the five case studies
 assets/css/style.css  Palette, layout, panels, CSS-drawn project thumbnails, case studies
 assets/js/main.js     Horizontal story, reveals, intro, hover effects, rail, menu, case studies
 404.html              Standalone "page not found" page
-favicon.svg           JH monogram
+favicon.svg           PR monogram
 robots.txt            Allows all crawlers
 ```
 
@@ -43,7 +43,7 @@ Everything below is placeholder content. Search `index.html` for each item:
 
 | What | Where |
 | --- | --- |
-| Name "Jordan Hale" and the "JH" monogram | `<title>`, meta tags, hero `<h1>`, rail, footer, `favicon.svg`, `404.html` |
+| Name "Priyanshu Raj" and the "PR" monogram | `<title>`, meta tags, hero `<h1>`, rail, footer, `favicon.svg`, `404.html` |
 | Tagline, intro, quote, hobbies | Hero and Chapter I |
 | Years in the intro counter | `.hero-years-strip` (one `<span>` per year) |
 | Location and time zone | `data-timezone="Asia/Singapore"` on `<main>` (any [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)), plus the "GMT+8" and "Singapore" labels |
@@ -81,12 +81,13 @@ Sizes use `--s`, which is 1/144 of the viewport width on desktop and 1/39 on pho
 | --- | --- | --- |
 | Smooth scroll | Lenis | `lerp: 0.085`, `wheelMultiplier: 1.08` |
 | Horizontal story | `main.js`, desktop `matchMedia` block | Pinned, scrubbed, linear. Pauses for one screen height at "The Work" |
-| "The Work" expansion | Same timeline | Rectangle scales from 0 to cover the screen; the words move apart with its edges |
+| "The Work" window | Same timeline | A centred window (clip-path) opens from nothing to full screen; the words move with its edges |
 | Line reveals | `revealLines()` | Lines rise from 102% below a mask, 1.7s, `power3.out`, 0.07s stagger |
 | Portrait reveal | `revealImage()` | Colour block wipes in, image slides in 0.2s later, 0.7s, `power2.out` |
 | Work hover | `showWork()` | Preview scales from 0, 0.45s, `power3.out`; other names fade to 25% |
 | Service hover | Chapter III block | Background wipes up, 0.8s, `power3.out`; exits upwards |
-| Intro | First visit per session | Years roll 2.85s, name slides in 1.78s, both `power4.inOut` |
+| Intro | Every load | First year rises (1.7s), years roll (2.85s) as a bar fills along the bottom, the year slides away (1.78s) and the name rises word by word (1.7s, 0.2s apart); the bar then grows into the hero background |
+| Menu | Toggle in the rail | Panel wipes open left to right (0.88s, `power3.out`); links rise 0.15s apart; closes right to left |
 
 Visitors who prefer reduced motion get plain sideways scrolling with no smoothing, no intro and no reveals.
 
