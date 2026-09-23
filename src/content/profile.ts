@@ -1,5 +1,16 @@
 import type { Intro, NavItem, Profile } from './types';
 
+/**
+ * The site's public address. Uses NEXT_PUBLIC_SITE_URL when set, otherwise the
+ * production domain Vercel provides. A missing https:// or a trailing slash is fixed.
+ */
+function siteUrl(): string {
+  const raw = (process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || '').trim();
+  if (!raw) return 'https://example.com';
+  const url = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+  return url.replace(/\/+$/, '');
+}
+
 export const profile: Profile = {
   name: 'Priyanshu Raj',
   heroLines: ['Priyanshu', 'Raj'],
@@ -21,7 +32,7 @@ export const profile: Profile = {
     { label: 'X', href: 'https://x.com/' },
   ],
   logo: { src: '/assets/img/logo.webp', alt: 'Priyanshu Raj logo', width: 500, height: 500 },
-  siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://example.com',
+  siteUrl: siteUrl(),
 };
 
 export const intro: Intro = {

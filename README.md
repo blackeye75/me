@@ -100,7 +100,7 @@ The video inside "The Work" window is `public/assets/video/work-reel.webm` with 
 
 ## Deploying
 
-Set `NEXT_PUBLIC_SITE_URL` to the site's public address (used for metadata, `robots.txt` and `sitemap.xml`).
+Set `NEXT_PUBLIC_SITE_URL` to the site's public address, for example `https://priyanshuraj.dev` (used for metadata, `robots.txt` and `sitemap.xml`). A value without `https://` works too. On Vercel it is optional: without it the site uses the project's production domain.
 
 - **Vercel**: import the repository; no configuration needed.
 - **Any Node host**: `npm run build && npm run start`.
