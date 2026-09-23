@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Page not found · Jordan Hale</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    :root { --bg: #E6E7E0; --ink: #131517; --muted: #5B605B; --line: #BFC3BA; --accent: #2F3CF5; color-scheme: light; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0F1112; --ink: #E3E5DE; --muted: #8E938E; --line: #2B2F31; --accent: #8D97FF; color-scheme: dark; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: grid;
+      align-content: end;
+      gap: 32px;
+      padding: 32px clamp(16px, 3.2vw, 44px);
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+    }
+    p { margin: 0; }
+    .code { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+    h1 {
+      margin: 0;
+      font: 800 clamp(5rem, 26vw, 24rem)/.8 "Archivo", "Arial Narrow", Arial, sans-serif;
+      font-stretch: 112%;
+      letter-spacing: -.05em;
+    }
+    .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
+    a { color: inherit; text-underline-offset: 4px; }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  </style>
+</head>
+<body>
+  <p class="code">GET <span id="path">/this-page</span> → 404 Not Found</p>
+  <h1>404</h1>
+  <div class="row">
+    <p>This page doesn’t exist, or it moved.</p>
+    <a href="/">Back to the homepage →</a>
+  </div>
+  <script>document.getElementById('path').textContent = location.pathname;</script>
+</body>
+</html>
