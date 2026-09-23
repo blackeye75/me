@@ -33,6 +33,7 @@ index.html            All page content, including the five case studies
 assets/css/style.css  Palette, layout, panels, CSS-drawn project thumbnails, case studies
 assets/js/main.js     Horizontal story, reveals, intro, hover effects, rail, menu, case studies
 404.html              Standalone "page not found" page
+assets/img/logo.webp  Logo (portrait head and Chapter V)
 assets/video/         Work reel (WebM and MP4) and its poster frame
 tools/reel/           Source and render script for the work reel
 favicon.svg           PR monogram
@@ -56,7 +57,8 @@ Everything below is placeholder content. Search `index.html` for each item:
 | Services | Chapter III (`.svc` articles) |
 | Experience | Chapter IV (`.client` rows); each row's `.client-logo` holds the SVG shown on hover |
 | Domain | `canonical`, `og:url` and `og:image` in `<head>` (these must be full `https://` URLs) |
-| Portrait | Replace the `.portrait-ph` placeholder inside `.about-portrait` with `<img src="…" alt="Portrait of …">` styled to fill the frame |
+| Portrait | `.about-portrait`: the logo sits in `.portrait-head`; the body shape is drawn in CSS. Replace the whole `.portrait-ph` with a photo if you prefer |
+| Logo | `assets/img/logo.webp`, used in the portrait and Chapter V |
 
 ### Adding or changing a project
 
@@ -92,6 +94,7 @@ Sizes use `--s`, which is 1/144 of the viewport width on desktop and 1/39 on pho
 | Portrait reveal | `revealImage()` | Colour block wipes in, image slides in 0.2s later, 0.7s, `power2.out` |
 | Work hover | `showWork()` | Preview scales from 0, 0.45s, `power3.out`; other names fade to 25% |
 | Service hover | Chapter III block | Background wipes up, 0.8s, `power3.out`; exits upwards |
+| Darkroom (Chapter V) | Second hold in the story (1.6 screens) | Starts as a red-lit negative. Letters of DARKROOM rise and fall into place, ENGINEERING tightens from wide spacing, the logo turns like a gear while coming into focus, a timer counts to 01:30, then a circular aperture opens onto the print (f/22 to f/2.8) |
 | Intro | Every load | First year rises (1.7s), years roll (2.85s) as a bar fills along the bottom, the year slides away (1.78s) and the name rises word by word (1.7s, 0.2s apart); the bar then grows into the hero background |
 | Menu | Toggle in the rail | Panel wipes open left to right (0.88s, `power3.out`); links rise 0.15s apart; closes right to left |
 

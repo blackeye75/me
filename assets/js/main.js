@@ -153,7 +153,7 @@
 
   const hTl = hasGsap ? gsap.timeline({ defaults: { ease: 'none' } }) : null;
   let hST = null;
-  const seg = { before: 0, pause: 0 };   // scroll distances, used to jump to a panel
+  const seg = { pauses: [] };           // where the strip holds still, used to jump to a panel
   const mwOpen = { w: 0, h: 0 };          // current size of the window, for the rail colour
   let rebuild = () => {};
 
@@ -196,6 +196,62 @@
     mwOpen.h = slot.offsetHeight;
   };
 
+  /* Chapter V: the darkroom. Adds its scroll-linked motion to a timeline at `at`, over `len`. */
+  const dr = $('[data-dr]');
+  const drNeg = $('[data-dr-neg]');
+  const drPrint = $('[data-dr-print]');
+  const drState = { r: 0 };   // current aperture radius, for the rail colour
+  const stops = ['f/22', 'f/16', 'f/11', 'f/8', 'f/5.6', 'f/4', 'f/2.8'];
+
+  const setAperture = (a, W, H) => {
+    const r = a * (Math.hypot(W, H) / 2 + 8);
+    drPrint.style.clipPath = `circle(${r}px at 50% 50%)`;
+    drState.r = r;
+    const stop = stops[Math.min(stops.length - 1, Math.floor(a * stops.length))];
+    $$('[data-dr-stop]', dr).forEach((el) => { el.textContent = stop; });
+  };
+  const setTimer = (p) => {
+    const secs = Math.round(p * 90);
+    const text = `${String(Math.floor(secs / 60)).padStart(2, '0')}:${String(secs % 60).padStart(2, '0')}`;
+    $$('[data-dr-time]', dr).forEach((el) => { el.textContent = text; });
+  };
+  const resetDarkroom = () => {
+    if (!dr) return;
+    drPrint.style.clipPath = '';
+    drState.r = 0;
+    gsap.set($$('[data-dr-letter], [data-dr-track], [data-dr-logo]', dr), { clearProps: 'transform,letterSpacing' });
+    gsap.set(drNeg, { clearProps: '--glow,--dr-blur' });
+  };
+
+  const addDarkroom = (tl, at, len) => {
+    if (!dr) return;
+    const W = dr.clientWidth;
+    const H = dr.clientHeight;
+    const aperture = { a: 0 };
+    const clock = { p: 0 };
+    const pos = (offset) => (typeof at === 'number' ? at + offset : `${at}+=${offset}`);
+    // Same delay for the same letter in both layers, so negative and print stay in register
+    const letterDelay = (i, el) => [...el.parentNode.children].indexOf(el) * len * 0.03;
+    setAperture(0, W, H);
+    setTimer(0);
+    // DARKROOM: letters rise and fall into place alternately, like teeth meshing
+    tl.fromTo($$('[data-dr-letter]', dr),
+      { yPercent: (i, el) => Number(el.dataset.dir) * 110 },
+      { yPercent: 0, duration: len * 0.2, ease: 'power3.out', stagger: letterDelay }, at);
+    // ENGINEERING: slides in wide and tightens to its final spacing
+    tl.fromTo($$('[data-dr-track]', dr),
+      { xPercent: 28, letterSpacing: '0.45em' },
+      { xPercent: 0, letterSpacing: '-0.01em', duration: len * 0.5, ease: 'power2.out' }, pos(len * 0.12));
+    // The logo turns like a gear the whole way through and grows into place
+    tl.fromTo($$('[data-dr-logo]', dr), { rotation: -150, scale: 0.72 }, { rotation: 210, scale: 1, duration: len, ease: 'none' }, at);
+    // The enlarger comes into focus and the safelight warms up
+    tl.fromTo(drNeg, { '--dr-blur': '10px', '--glow': 0.45 }, { '--dr-blur': '0px', '--glow': 0.95, duration: len * 0.5, ease: 'power1.out' }, at);
+    // Development timer runs 00:00 to 01:30
+    tl.fromTo(clock, { p: 0 }, { p: 1, duration: len, ease: 'none', onUpdate: () => setTimer(clock.p) }, at);
+    // The aperture opens from the centre onto the print
+    tl.fromTo(aperture, { a: 0 }, { a: 1, duration: len * 0.45, ease: 'power2.in', onUpdate: () => setAperture(aperture.a, W, H) }, pos(len * 0.55));
+  };
+
   if (hasGsap) {
     const mm = gsap.matchMedia();
 
@@ -207,6 +263,7 @@
         hTl.clear();
         gsap.set(track, { clearProps: 'transform' });
         resetWindow();
+        resetDarkroom();
 
         const vw = pin.clientWidth;
         const vh = pin.clientHeight;
@@ -214,29 +271,32 @@
 
         if (reduce) {
           hTl.fromTo(track, { x: 0 }, { x: -maxX, duration: maxX });
-          seg.before = Infinity;
-          seg.pause = 0;
+          seg.pauses = [];
           hST = ScrollTrigger.create({ trigger: pin, animation: hTl, start: 'top top', end: `+=${maxX}`, pin: true, scrub: true, anticipatePin: 1 });
         } else {
           // Slide until "The Work" is centred, hold for one screen height while the window opens, then carry on.
           const d = measureWindow(false);
+          // Two holds: one for "The Work", a longer one for the darkroom.
           const before = Math.max(0, mw.offsetLeft - (vw - mw.offsetWidth) / 2);
           const pause = vh;
-          const after = Math.max(0, maxX - before);
+          const drAt = dr ? Math.max(before, dr.offsetLeft - (vw - dr.offsetWidth) / 2) : maxX;
+          const drPause = dr ? vh * 1.6 : 0;
           box.t = 0;
           setWindow(0, d);
           hTl
             .fromTo(track, { x: 0 }, { x: -before, duration: before })
             .addLabel('expand')
             .fromTo(box, { t: 0 }, { t: 1, duration: pause, onUpdate: () => setWindow(box.t, d) }, 'expand')
-            .fromTo(track, { x: -before }, { x: -maxX, duration: after });
-          seg.before = before;
-          seg.pause = pause;
+            .fromTo(track, { x: -before }, { x: -drAt, duration: drAt - before })
+            .addLabel('darkroom');
+          addDarkroom(hTl, 'darkroom', drPause);
+          hTl.fromTo(track, { x: -drAt }, { x: -maxX, duration: Math.max(0, maxX - drAt) }, `darkroom+=${drPause}`);
+          seg.pauses = [{ at: before, len: pause }, { at: drAt, len: drPause }];
           hST = ScrollTrigger.create({
             trigger: pin,
             animation: hTl,
             start: 'top top',
-            end: `+=${before + pause + after}`,
+            end: `+=${maxX + pause + drPause}`,
             pin: true,
             scrub: true,
             anticipatePin: 1,
@@ -280,6 +340,8 @@
       if (reduce) return undefined;
       let st = null;
       let tl = null;
+      let drSt = null;
+      let drTl = null;
       const box = { t: 0 };
       const build = () => {
         st?.kill(true);
@@ -290,7 +352,18 @@
         setWindow(0, d);
         tl = gsap.timeline({ defaults: { ease: 'none' } })
           .fromTo(box, { t: 0 }, { t: 1, onUpdate: () => setWindow(box.t, d) });
-        st = ScrollTrigger.create({ trigger: mw, animation: tl, start: 'top top', end: `+=${d.H}`, pin: true, scrub: true, anticipatePin: 1 });
+        // The panels sit in a flex column, where pin spacing is off by default; switch it on.
+        st = ScrollTrigger.create({ trigger: mw, animation: tl, start: 'top top', end: `+=${d.H}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1 });
+
+        drSt?.kill(true);
+        drTl?.kill();
+        resetDarkroom();
+        if (dr) {
+          const len = dr.clientHeight * 1.6;
+          drTl = gsap.timeline({ defaults: { ease: 'none' } });
+          addDarkroom(drTl, 0, len);
+          drSt = ScrollTrigger.create({ trigger: dr, animation: drTl, start: 'top top', end: `+=${len}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1 });
+        }
       };
       build();
       rebuild = build;
@@ -307,7 +380,10 @@
         rebuild = () => {};
         st?.kill(true);
         tl?.kill();
+        drSt?.kill(true);
+        drTl?.kill();
         resetWindow();
+        resetDarkroom();
       };
     });
   }
@@ -363,11 +439,19 @@
       const r = mw.getBoundingClientRect();
       overWindow = Math.abs(x - (r.left + r.width / 2)) < mwOpen.w / 2 && Math.abs(y - (r.top + r.height / 2)) < mwOpen.h / 2;
     }
-    if (hit && (hit !== railPanel || overWindow !== railDark)) {
+    // In the darkroom, the rail turns to paper once the aperture reaches it.
+    let overPrint = false;
+    if (hit && hit === dr) {
+      const r = dr.getBoundingClientRect();
+      overPrint = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)) < drState.r;
+    }
+    const tone = overWindow ? 'window' : overPrint ? 'print' : 'panel';
+    if (hit && (hit !== railPanel || tone !== railDark)) {
       railPanel = hit;
-      railDark = overWindow;
+      railDark = tone;
       if (!menuIsOpen) {
-        if (overWindow) paintRail('#262220', '#f3eee8', '#5a524d');
+        if (tone === 'window') paintRail('#262220', '#f3eee8', '#5a524d');
+        else if (tone === 'print') paintRail('#faf9f6', '#2e2b28', '#b8b3ac');
         else paintRail(hit.dataset.railBg, hit.dataset.railFg, hit.dataset.railLine);
       }
     }
@@ -667,8 +751,8 @@
     if (!el || id === 'top') return 0;
     if (isDesktop() && hST) {
       const left = el.offsetLeft;
-      const distance = left <= seg.before ? left : seg.before + seg.pause + (left - seg.before);
-      return hST.start + distance;
+      const held = seg.pauses.reduce((sum, p) => (left > p.at ? sum + p.len : sum), 0);
+      return hST.start + left + held;
     }
     return el.getBoundingClientRect().top + scrollY - (isDesktop() ? 0 : 56);
   };
@@ -684,7 +768,7 @@
   const menuMain = $('main');
   let menuTl = null;
 
-  const navFor = { top: 'top', about: 'about', 'the-work': 'work', work: 'work', services: 'experience', experience: 'experience', contact: 'contact' };
+  const navFor = { top: 'top', about: 'about', 'the-work': 'work', work: 'work', services: 'experience', experience: 'experience', darkroom: 'experience', contact: 'contact' };
   const markActive = () => {
     const current = navFor[railPanel?.id] ?? 'top';
     menuItems.forEach((it) => it.classList.toggle('is-active', it.dataset.nav === current));

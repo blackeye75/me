@@ -503,18 +503,28 @@ html:not(.motion) .menu.is-open .menu-panel { clip-path: none; }
 .ir-overlay { position: absolute; inset: 0; z-index: 1; background: #dcd5cb; visibility: hidden; }
 .ir-media { position: absolute; inset: 0; z-index: 2; }
 .portrait-ph {
-  display: grid;
-  place-items: center;
+  position: relative;
+  display: block;
   width: 100%;
   height: 100%;
   background:
-    radial-gradient(60% 45% at 50% 38%, #a39a8f 0 60%, transparent 61%),
     radial-gradient(90% 60% at 50% 100%, #6f675e 0 55%, transparent 56%),
     linear-gradient(180deg, #e7e2da, #cfc8be);
-  color: var(--paper);
-  font: 400 calc(4 * var(--s))/1 var(--serif);
 }
-.portrait-ph span { transform: translateY(-40%); }
+/* The head circle holds the logo; the body stays as drawn */
+.portrait-head {
+  position: absolute;
+  top: 11%;
+  left: 14%;
+  width: 72%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f3eee8;
+  overflow: hidden;
+}
+.portrait-head img { display: block; width: 88%; height: auto; }
 
 @media (min-width: 768px) {
   .panel--about { grid-template-columns: 1fr 1fr; gap: var(--vg); }
@@ -814,6 +824,91 @@ html:not(.motion-ready) .svc:hover .svc-bg { opacity: 1; }
   .clients-list.is-interactive .client:hover .client-logo { clip-path: inset(0 0 0 0); }
   .clients-list.is-interactive .client.is-dim { opacity: .25; }
   .client.is-active .client-meta { opacity: 1; }
+}
+
+/* ==========================================================================
+   Chapter V — darkroom
+   Two copies of the same composition: a red-lit negative on top of a paper
+   print. Scrolling focuses the logo, turns it like a gear, tightens the
+   lettering and opens a circular aperture onto the print.
+   ========================================================================== */
+
+.panel--dr {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 0;
+  background: #120d0c;
+}
+.dr-layer { position: absolute; inset: 0; overflow: hidden; }
+.dr-layer--neg {
+  --glow: .45;
+  --dr-blur: 0px;
+  background:
+    radial-gradient(60% 55% at 50% 50%, rgba(170, 40, 28, var(--glow)), transparent 72%),
+    #120d0c;
+  color: #e0584a;
+}
+.dr-layer--print { background: var(--paper); color: var(--ink); }
+.motion .dr-layer--neg { --dr-blur: 10px; }
+.motion .dr-layer--print { clip-path: circle(0px at 50% 50%); }
+
+.dr-chapter { position: absolute; top: calc(var(--bar) + 24px); left: 20px; }
+.dr-meta {
+  position: absolute;
+  margin: 0;
+  font: 400 11px/1.35 var(--mono);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-variant-numeric: tabular-nums;
+}
+.dr-layer--neg .dr-meta { color: #a3483d; }
+.dr-layer--print .dr-meta { color: var(--ink-muted); }
+.dr-meta--time { top: calc(var(--bar) + 24px); right: 20px; }
+.dr-meta--stop { bottom: 24px; left: 20px; }
+.dr-meta--note { bottom: 24px; right: 20px; text-align: right; }
+
+.dr-title { margin: 0; font-weight: 400; }
+.dr-word {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  display: block;
+  font: 400 calc(7.2 * var(--s))/.9 var(--serif);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dr-word--a { top: 20%; }
+.dr-word--b { bottom: 20%; text-align: right; font-size: calc(5.2 * var(--s)); }
+.dr-line { display: block; overflow: hidden; padding-bottom: .06em; }
+.dr-char { display: inline-block; }
+.dr-track { display: inline-block; letter-spacing: -.01em; }
+
+.dr-logo-wrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.dr-logo {
+  --size: min(56vw, 34svh);
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f3eee8;
+}
+.dr-logo img { display: block; width: 88%; height: auto; }
+/* The negative: inverted, tinted by the safelight, out of focus until developed */
+.dr-layer--neg .dr-logo {
+  filter: invert(1) sepia(1) saturate(4) hue-rotate(-40deg) brightness(.75) blur(var(--dr-blur));
+}
+
+@media (min-width: 768px) {
+  .dr-chapter { top: var(--vg); left: calc(var(--rail) + 4rem); }
+  .dr-meta { font-size: max(11px, calc(.9 * var(--s))); }
+  .dr-meta--time { top: var(--vg); right: 64px; }
+  .dr-meta--stop { bottom: var(--vg); left: calc(var(--rail) + 4rem); }
+  .dr-meta--note { bottom: var(--vg); right: 64px; }
+  .dr-word { left: calc(var(--rail) + 4rem); right: 64px; font-size: calc(15 * var(--s)); }
+  .dr-word--a { top: 11vh; }
+  .dr-word--b { bottom: 11vh; font-size: calc(12.5 * var(--s)); }
+  .dr-logo { --size: min(40vh, 26 * var(--s)); width: min(40vh, calc(26 * var(--s))); }
 }
 
 /* ==========================================================================
