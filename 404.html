@@ -8,12 +8,9 @@
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@400&display=swap">
   <style>
-    :root { --bg: #E6E7E0; --ink: #131517; --muted: #5B605B; --line: #BFC3BA; --accent: #2F3CF5; color-scheme: light; }
-    @media (prefers-color-scheme: dark) {
-      :root { --bg: #0F1112; --ink: #E3E5DE; --muted: #8E938E; --line: #2B2F31; --accent: #8D97FF; color-scheme: dark; }
-    }
+    :root { --bg: #262220; --ink: #f3eee8; --muted: #8a8178; --line: #5a524d; --accent: #b4582f; color-scheme: dark; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -25,15 +22,13 @@
       padding: 32px clamp(16px, 3.2vw, 44px);
       background: var(--bg);
       color: var(--ink);
-      font-family: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+      font-family: "Geist", "Helvetica Neue", Arial, sans-serif;
     }
     p { margin: 0; }
     .code { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
     h1 {
       margin: 0;
-      font: 800 clamp(5rem, 26vw, 24rem)/.8 "Archivo", "Arial Narrow", Arial, sans-serif;
-      font-stretch: 112%;
-      letter-spacing: -.05em;
+      font: 400 clamp(6rem, 30vw, 28rem)/.84 "Instrument Serif", "Times New Roman", serif;
     }
     .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
     a { color: inherit; text-underline-offset: 4px; }

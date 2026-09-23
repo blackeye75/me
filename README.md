@@ -1,8 +1,21 @@
 # Folio — developer edition
 
-A one-page developer portfolio in plain HTML, CSS and JavaScript. No framework, no build step and no dependencies apart from Google Fonts.
+A developer portfolio in plain HTML, CSS and JavaScript, with no build step.
 
-The editorial structure (chapters, oversized type, numbered menu, loading intro, live clock and hover-preview work list) is inspired by [khanhnguyen.design](https://khanhnguyen.design/). All code and content here are original.
+On desktop the whole page is one horizontal story. Scrolling down moves a pinned strip of full-screen panels sideways. Halfway along, the strip pauses while a small rectangle between the words "The" and "Work" grows to fill the screen, then the journey continues. On phones the same panels stack vertically with the same reveals.
+
+The layout and motion are modelled on [khanhnguyen.design](https://khanhnguyen.design/): chapters, the side rail that changes colour with each panel, line-by-line text reveals and the expanding "The Work" transition. The code, content and fonts here are original or openly licensed.
+
+## Libraries
+
+Loaded from CDNs in `index.html`, all free to use:
+
+- [GSAP](https://gsap.com/) 3.13 with ScrollTrigger (pinning, scroll-linked timelines) and SplitText (line reveals)
+- [Lenis](https://lenis.darkroom.engineering/) 1.3 for smooth scrolling (`lerp: 0.085`)
+
+Fonts: Instrument Serif (display), Geist (body) and Geist Mono (labels and code), from Google Fonts.
+
+If the libraries fail to load, the page falls back to a normal vertical layout with everything visible.
 
 ## Run it
 
@@ -17,8 +30,8 @@ python3 -m http.server 8000
 
 ```
 index.html            All page content, including the five case studies
-assets/css/style.css  Design tokens, layout, components and CSS-drawn project thumbnails
-assets/js/main.js     Intro, menu, theme toggle, clock, hover previews, case studies, copy email
+assets/css/style.css  Palette, layout, panels, CSS-drawn project thumbnails, case studies
+assets/js/main.js     Horizontal story, reveals, intro, hover effects, rail, menu, case studies
 404.html              Standalone "page not found" page
 favicon.svg           JH monogram
 robots.txt            Allows all crawlers
@@ -30,22 +43,24 @@ Everything below is placeholder content. Search `index.html` for each item:
 
 | What | Where |
 | --- | --- |
-| Name "Jordan Hale" and the "JH" monogram | `<title>`, meta tags, hero `<h1>`, header, footer, `favicon.svg`, `404.html` |
+| Name "Jordan Hale" and the "JH" monogram | `<title>`, meta tags, hero `<h1>`, rail, footer, `favicon.svg`, `404.html` |
 | Tagline, intro, quote, hobbies | Hero and Chapter I |
+| Years in the intro counter | `.hero-years-strip` (one `<span>` per year) |
 | Location and time zone | `data-timezone="Asia/Singapore"` on `<main>` (any [IANA time zone](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)), plus the "GMT+8" and "Singapore" labels |
-| Availability | Hero "Status" and the footer "Availability" block |
+| Availability | Hero "Open for collaborations" |
 | Email | `mailto:` link and the `data-copy` value in the footer |
-| Social links | Menu "Elsewhere" and footer "Social" |
+| Social links | Menu and footer |
 | Projects | Work list rows in Chapter II and the matching `<dialog class="case">` blocks at the end of `<body>` |
-| Services, toolbox, experience | Chapters III, IV and V |
+| Services | Chapter III (`.svc` articles) |
+| Experience | Chapter IV (`.client` rows) |
 | Domain | `canonical`, `og:url` and `og:image` in `<head>` (these must be full `https://` URLs) |
-| Portrait | Replace the `.portrait-frame` placeholder with `<img src="…" alt="Portrait of …" width="…" height="…">` |
+| Portrait | Replace the `.portrait-ph` placeholder inside `.about-portrait` with `<img src="…" alt="Portrait of …">` styled to fill the frame |
 
 ### Adding or changing a project
 
 Each project has two parts that share an id (for example `kiln`):
 
-1. **A row in the work list:** `<a class="work-link" href="#kiln" data-case="kiln">`.
+1. **A row in the work list:** `<a class="work-link" href="#kiln" data-case="kiln">`, plus a matching `.work-img` preview in the same position inside `.work-preview`.
 2. **A case study dialog:** `<dialog class="case" id="kiln">`, containing the problem, approach, key decisions, a code excerpt and outcome metrics.
 
 Update the `NN / 05` counter and the "Next project" button (`data-open="…"`) in each dialog so the projects link in a loop. Links like `yoursite.com/#kiln` open that case study directly.
@@ -54,17 +69,26 @@ Update the `NN / 05` counter and the "Next project" button (`data-open="…"`) i
 
 Project thumbnails are drawn with CSS (`.cover--dash`, `--term`, `--shop`, `--board`, `--search`), so they weigh nothing and stay sharp at any size. To use screenshots instead, replace the `<span class="cover …">` markup with an `<img>` that has real `alt` text and explicit `width` and `height`.
 
-### Colours and fonts
+### Colours and type
 
-All colours are tokens at the top of `style.css`, with a light palette and a dark palette. The fonts are Archivo (display, using its width axis), IBM Plex Sans (body) and IBM Plex Mono (labels and code).
+Panel colours are tokens at the top of `style.css`. Each panel also carries `data-rail-bg`, `data-rail-fg` and `data-rail-line`, which the rail switches to when that panel is underneath it.
 
-## Behaviour notes
+Sizes use `--s`, which is 1/144 of the viewport width on desktop and 1/39 on phones, so the composition scales with the screen.
 
-- The intro plays once per visit and is skipped when the visitor prefers reduced motion.
-- Theme follows the system setting. The menu has a System / Light / Dark toggle, which is saved in `localStorage`.
-- Scroll reveals use CSS scroll-driven animations. Browsers without support show everything immediately.
-- Tablets work in both orientations. There is no "rotate your screen" lock.
-- The menu and case studies close with Escape, trap focus while open, and return focus to where you were.
+## Motion reference
+
+| Effect | Where | Timing |
+| --- | --- | --- |
+| Smooth scroll | Lenis | `lerp: 0.085`, `wheelMultiplier: 1.08` |
+| Horizontal story | `main.js`, desktop `matchMedia` block | Pinned, scrubbed, linear. Pauses for one screen height at "The Work" |
+| "The Work" expansion | Same timeline | Rectangle scales from 0 to cover the screen; the words move apart with its edges |
+| Line reveals | `revealLines()` | Lines rise from 102% below a mask, 1.7s, `power3.out`, 0.07s stagger |
+| Portrait reveal | `revealImage()` | Colour block wipes in, image slides in 0.2s later, 0.7s, `power2.out` |
+| Work hover | `showWork()` | Preview scales from 0, 0.45s, `power3.out`; other names fade to 25% |
+| Service hover | Chapter III block | Background wipes up, 0.8s, `power3.out`; exits upwards |
+| Intro | First visit per session | Years roll 2.85s, name slides in 1.78s, both `power4.inOut` |
+
+Visitors who prefer reduced motion get plain sideways scrolling with no smoothing, no intro and no reveals.
 
 ## Deploy
 
