@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ContentImage as Image } from '../image/ContentImage';
 import type { Image as ImageData, Project, WorksPage } from '@/content';
 import { CodeBlock } from './CodeBlock';
 import styles from './CaseStudy.module.css';

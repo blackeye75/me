@@ -4,13 +4,14 @@ import { CaseStudy } from '@/components/case-study/CaseStudy';
 import { Shell } from '@/components/shell/Shell';
 import { getContent } from '@/lib/content';
 
-/** Every project page is built ahead of time. */
+/**
+ * Every project page is built ahead of time. Projects added later in the admin
+ * panel are rendered on their first visit (unknown addresses still 404).
+ */
 export async function generateStaticParams() {
   const { projects } = await getContent();
   return projects.map((project) => ({ slug: project.slug }));
 }
-
-export const dynamicParams = false;
 
 export async function generateMetadata({ params }: PageProps<'/works/[slug]'>): Promise<Metadata> {
   const { slug } = await params;

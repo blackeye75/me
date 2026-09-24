@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ContentImage as Image } from '../image/ContentImage';
 import type { ServicesSection } from '@/content';
 import { Panel, tones } from '../story/Story';
 import styles from './Services.module.css';

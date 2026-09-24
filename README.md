@@ -34,9 +34,11 @@ npm run dev        # http://localhost:3000
 
 ```
 src/
-  app/                 Routes: home, about/, works/, works/[slug]/, plus layout (fonts, metadata, boot script), 404, icon, robots, sitemap
+  app/                 Routes: home, about/, works/, works/[slug]/, admin/, plus layout (fonts, metadata, boot script), 404, icon, robots, sitemap
   content/             All site content, typed. Edit these files to change what the site says
-  lib/content.ts       getContent(): the one place pages read content from (the CMS seam)
+  lib/content.ts       getContent(): the one place pages read content from (Supabase over the defaults)
+  lib/supabase/        Supabase connection settings and clients
+  cms/schema.ts        What the admin panel can edit, section by section
   components/          One folder per component, each with its own CSS Module
     shell/             What every page shares: rail, menu, page curtain, motion
     story/             The pinned strip and the Panel wrapper every sideways section uses
@@ -46,12 +48,15 @@ src/
     works/             The works page's card row
     case-study/        A project page and its code block
     portrait/          The drawn portrait with the logo in the head circle
-    copy-email/        The only interactive React component (client)
+    image/             next/image for pictures that come from the content
+    admin/             The admin panel: sign-in, editor, forms, uploads
+    copy-email/        The copy-email button (client)
     motion/            <Motion />: starts the motion layer after hydration
   motion/              Scroll and hover motion (GSAP, ScrollTrigger, SplitText, Lenis)
 public/assets/         Logo, experience logos, work reel videos, rendered pictures (shots/)
 tools/reel/            Source and render script for the work reel videos
 tools/shots/           Source and render script for the project, service and About pictures
+supabase/migrations/   Database tables, security rules and storage for the admin panel
 ```
 
 ### Components and motion
@@ -71,7 +76,7 @@ Links between pages are plain `<a>` elements rather than `next/link`, so every p
 | `work-window.ts` | "The Work" window opening from the centre |
 | `darkroom.ts` | Chapter V: negative, focus, gear, timer and aperture |
 | `intro.ts` | Years counter, loading bar and name reveal on every load |
-| `reveals.ts` | Line-by-line text reveals per section |
+| `reveals.ts` | Reveals for text, pictures and lists; each replays whenever it comes back into view |
 | `rail.ts` | Rail colours per panel and scroll progress |
 | `menu.ts` | Menu open/close and section navigation |
 | `hovers.ts` | Work previews, experience logos (on phones, the row in focus), service backgrounds |
@@ -89,7 +94,11 @@ Fonts are loaded with `next/font`: Instrument Serif (display), Geist (body) and 
 
 ## Editing content
 
-All text, links and images come from `src/content`:
+There are two ways to change what the site says.
+
+**In the admin panel** (`/admin`), once Supabase is connected (see below). Every section can be edited there: profile, menu, each home page chapter, projects with their pictures and case studies, the About page and the works page labels. Lists can be added to, reordered, duplicated and deleted, and pictures and videos can be uploaded. Saving publishes straight away.
+
+**In the code**, in `src/content`. These files are also the defaults: any section never saved in the admin panel comes from here.
 
 | File | Contains |
 | --- | --- |
@@ -101,15 +110,38 @@ All text, links and images come from `src/content`:
 
 Line breaks in short copy are written as `\n`. The `slug` of a project is its page address (for example `/works/kiln`). Old links such as `/#kiln` forward to the project page.
 
-## Adding a CMS (next phase)
+## Admin panel and Supabase
 
-Pages never import content directly. They call `getContent()` in `src/lib/content.ts`, which returns a `SiteContent` object. To connect a CMS:
+Pages never import content directly. They call `getContent()` in `src/lib/content.ts`. With Supabase configured, it reads the saved sections from Supabase and lays them over the defaults in `src/content`. If Supabase isn't configured or can't be reached, the site uses the defaults.
 
-1. Model the CMS collections on the types in `src/content/types.ts`.
-2. In `getContent()`, fetch from the CMS and map the response to `SiteContent`.
-3. Choose how updates reach the site: time-based revalidation, or on-demand revalidation from a CMS webhook.
+Each section is one row in a `content` table, stored as JSON. Anyone can read it; only the email addresses in an `admins` table can change it, which Supabase enforces with row level security. Uploads go to a public `media` storage bucket.
 
-No component needs to change.
+**Setting it up**
+
+1. Create a project at [supabase.com](https://supabase.com).
+2. In its SQL editor, run `supabase/migrations/20260924000000_cms.sql`. This creates the tables, the security rules and the `media` bucket.
+3. Under **Authentication → Users**, add a user with your email and a password.
+4. Allow that email to edit, in the SQL editor:
+   ```sql
+   insert into public.admins (email) values ('you@example.com');
+   ```
+5. Copy the project URL and the anon (publishable) key from **Project Settings → API**. Set them as `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local` (see `.env.example`) and in Vercel's environment variables, then redeploy.
+6. Open `/admin` and sign in.
+
+**How it works**
+
+| Piece | Where |
+| --- | --- |
+| Admin page: sign-in, access check, loading saved sections | `src/app/admin/page.tsx` |
+| Saving and resetting (server actions; they publish by expiring the content cache) | `src/app/admin/actions.ts` |
+| What each section's form contains | `src/cms/schema.ts` |
+| The editor, forms and uploads | `src/components/admin/` |
+| Supabase clients, and the session refresh for `/admin` | `src/lib/supabase/`, `src/proxy.ts` |
+| Tables, security rules and storage | `supabase/migrations/` |
+
+The public pages stay static. Saving in the admin panel expires the cached content and the pages, so the next visit shows the change. A project added in the admin panel gets its page (`/works/<address>`) on its first visit. To make a new field editable, add it to the content model and one line to `src/cms/schema.ts`.
+
+"Reset to default" deletes a section's saved copy, so the site goes back to what's in `src/content`.
 
 ## The work reel
 
@@ -121,7 +153,7 @@ The project, service and About pictures in `public/assets/shots` are drawn in th
 
 ## Deploying
 
-Set `NEXT_PUBLIC_SITE_URL` to the site's public address, for example `https://priyanshuraj.dev` (used for metadata, `robots.txt` and `sitemap.xml`). A value without `https://` works too. On Vercel it is optional: without it the site uses the project's production domain.
+Set the environment variables in `.env.example`. `NEXT_PUBLIC_SITE_URL` is the site's public address, for example `https://priyanshuraj.dev` (used for metadata, `robots.txt` and `sitemap.xml`). A value without `https://` works too. On Vercel it is optional: without it the site uses the project's production domain.
 
-- **Vercel**: import the repository; no configuration needed.
+- **Vercel**: import the repository. Add the Supabase variables to use the admin panel.
 - **Any Node host**: `npm run build && npm run start`.

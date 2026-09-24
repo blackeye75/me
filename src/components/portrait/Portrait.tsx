@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ContentImage as Image } from '../image/ContentImage';
 import type { Image as ImageData } from '@/content';
 import styles from './Portrait.module.css';
 

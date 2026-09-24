@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ContentImage as Image } from '../image/ContentImage';
 import type { Project, WorksPage } from '@/content';
 import styles from './WorksList.module.css';
 

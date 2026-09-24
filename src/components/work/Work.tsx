@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import { ContentImage as Image } from '../image/ContentImage';
 import type { Project, WorkSection } from '@/content';
 import { cornerClass, Panel, tones } from '../story/Story';
 import styles from './Work.module.css';
