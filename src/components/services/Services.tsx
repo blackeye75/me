@@ -1,9 +1,9 @@
+import Image from 'next/image';
 import type { ServicesSection } from '@/content';
-import { Cover } from '../cover/Cover';
 import { Panel, tones } from '../story/Story';
 import styles from './Services.module.css';
 
-/** Chapter III. A statement followed by one column per service. */
+/** Chapter III. A statement followed by one column per service, each with a picture behind it. */
 export function Services({ services }: { services: ServicesSection }) {
   return (
     <Panel id="services" className={styles.services} tone={tones.dark} fit data-services aria-labelledby="services-title">
@@ -18,7 +18,7 @@ export function Services({ services }: { services: ServicesSection }) {
         <article key={service.title.join(' ')} className={styles.item} data-svc tabIndex={0}>
           <div className={styles.bg} data-svc-bg aria-hidden="true">
             <div className={styles.media} data-svc-media>
-              <Cover cover={service.cover} className={styles.fill} />
+              <Image src={service.image.src} alt="" fill sizes="(min-width: 768px) 28vw, 100vw" className={styles.fill} />
             </div>
           </div>
           <p className={styles.num} data-reveal>{String(i + 1).padStart(2, '0')}</p>

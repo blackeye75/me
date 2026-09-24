@@ -12,7 +12,7 @@
   z-index: 1;
   inset: 0;
   background: var(--hero-bg);
-  clip-path: inset(calc(50% - 6.5 * var(--s)) calc(50% - 11 * var(--s)));
+  clip-path: inset(calc(50% - 12.5 * var(--s)) calc(50% - 7 * var(--s)));
 }
 .inner { position: absolute; inset: 0; transform-origin: 50% 50%; }
 .video {
@@ -34,17 +34,18 @@
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
   justify-items: center;
-  row-gap: calc(1.2 * var(--s));
+  row-gap: 0;
   pointer-events: none;
 }
 .word {
-  font: 400 calc(4.6 * var(--s))/.9 var(--serif);
+  font: 400 calc(7.8 * var(--s))/.9 var(--serif);
   text-transform: uppercase;
   white-space: nowrap;
 }
 .wordA { align-self: end; }
 .wordB { align-self: start; }
-.slot { width: calc(22 * var(--s)); height: calc(13 * var(--s)); }
+/* Phones: a tall window, like the phone it plays on */
+.slot { width: calc(14 * var(--s)); height: calc(25 * var(--s)); }
 
 @media (min-width: 768px) {
   .reveal { clip-path: inset(calc(50% - 7 * var(--s)) calc(50% - 12.45 * var(--s))); }

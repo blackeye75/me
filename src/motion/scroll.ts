@@ -29,7 +29,11 @@ export function createScroll({ smooth, reduce }: { smooth: boolean; reduce: bool
   return {
     lenis,
     scrollTo(y, { immediate = false } = {}) {
-      if (lenis) lenis.scrollTo(y, { immediate, force: true, duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
+      if (lenis) {
+        // Lenis caches the page height; measure again in case pins have changed it since.
+        lenis.resize();
+        lenis.scrollTo(y, { immediate, force: true, duration: 1.8, easing: (t) => 1 - Math.pow(1 - t, 4) });
+      }
       else window.scrollTo({ top: y, behavior: immediate || reduce ? 'auto' : 'smooth' });
     },
     lock(key, locked) {

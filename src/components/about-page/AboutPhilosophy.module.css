@@ -1,0 +1,24 @@
+.philosophy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 64px;
+  min-height: 90svh;
+  background: var(--dark);
+  color: var(--dark-fg);
+  text-align: center;
+}
+.label { color: var(--dark-muted); }
+.quote {
+  margin: 0;
+  font: 400 12.4vw/.94 var(--serif);
+  text-transform: uppercase;
+}
+/* Each letter lights up in turn while the quote passes (see motion/about.ts) */
+.quote :global(.char) { color: #5f5a54; }
+
+@media (min-width: 768px) {
+  .philosophy { min-height: 0; text-align: left; }
+  .label { align-self: center; }
+  .quote { max-width: 11ch; font-size: calc(6.4 * var(--s)); }
+}

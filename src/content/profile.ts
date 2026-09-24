@@ -42,11 +42,10 @@ export const intro: Intro = {
   scrollHint: 'Scroll',
 };
 
-/** Menu entries. `target` is the id of the section to scroll to. */
+/** Menu entries: pages, or a place on the home page after "#". */
 export const nav: NavItem[] = [
-  { label: 'Home', target: 'top' },
-  { label: 'About', target: 'about' },
-  { label: 'Work', target: 'work' },
-  { label: 'Experience', target: 'experience' },
-  { label: 'Contact', target: 'contact' },
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
+  { label: 'Works', href: '/works' },
+  { label: 'Contact', href: '/#contact' },
 ];

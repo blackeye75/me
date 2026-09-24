@@ -20,13 +20,16 @@ export function Footer({ footer, profile, year }: Props) {
             <span key={line} className="mask"><span className={styles.word} data-rise data-ft-word>{line}</span></span>
           ))}
         </h2>
-        <ul className={styles.social}>
-          {profile.socials.map((link) => (
-            <li key={link.href} className="mask">
-              <a href={link.href} target="_blank" rel="noopener" data-ft-line>{link.label}</a>
-            </li>
-          ))}
-        </ul>
+        <div className={styles.socialCol}>
+          <p className={`label ${styles.socialLabel}`}><span className="mask"><span data-ft-line>{footer.socialLabel}</span></span></p>
+          <ul className={styles.social}>
+            {profile.socials.map((link) => (
+              <li key={link.href} className="mask">
+                <a href={link.href} target="_blank" rel="noopener" data-ft-line>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className={styles.bottom}>
         <div className={styles.contact}>
@@ -41,7 +44,7 @@ export function Footer({ footer, profile, year }: Props) {
           </p>
         </div>
         <p className={`label ${styles.sign}`} data-reveal><Lines text={footer.sign} /></p>
-        <p className={`label ${styles.copyright}`} data-reveal>© {year} {profile.name}<br />{footer.credit}</p>
+        <p className={`label ${styles.copyright}`} data-reveal><span>© {year} {profile.name}</span><br /><span>{footer.credit}</span></p>
       </div>
     </Panel>
   );

@@ -85,10 +85,13 @@ export function initWorkHover({ dispose, reduce, rail, isMenuOpen }: { dispose: 
   });
 }
 
-/** Chapter IV: hovering a name fades the others (its logo tile is pure CSS). */
-export function initExperienceHover({ dispose }: { dispose: Disposer }) {
+/**
+ * Chapter IV. Desktop: hovering a name fades the others (its logo tile is pure CSS).
+ * Phones: the name crossing the middle of the screen is in focus and shows its logo.
+ */
+export function initExperience({ dispose }: { dispose: Disposer }) {
   const list = $('[data-clients-list]');
-  if (!list) return;
+  if (!list) return () => {};
   const rows = $$('[data-client]:not([data-client-more])', list);
   rows.forEach((row, i) => {
     const on = () => {
@@ -101,10 +104,27 @@ export function initExperienceHover({ dispose }: { dispose: Disposer }) {
     dispose.on(row, 'pointerenter', on);
     dispose.on(row, 'focusin', on);
   });
-  dispose.on(list, 'pointerleave', () => rows.forEach((r) => { r.removeAttribute('data-dim'); r.removeAttribute('data-active'); }));
+  dispose.on(list, 'pointerleave', () => { if (isDesktop()) rows.forEach((r) => { r.removeAttribute('data-dim'); r.removeAttribute('data-active'); }); });
+
+  const mm = gsap.matchMedia();
+  mm.add(MOBILE, () => {
+    // The first row stays in focus until the list reaches the middle, the last one after it has passed.
+    const last = rows.length - 1;
+    const triggers = rows.map((row, i) => ScrollTrigger.create({
+      trigger: row,
+      start: i === 0 ? 'top bottom' : 'top 55%',
+      end: i === last ? 'bottom top' : 'bottom 55%',
+      onToggle: (self) => row.toggleAttribute('data-active', self.isActive),
+    }));
+    return () => {
+      triggers.forEach((st) => st.kill());
+      rows.forEach((r) => r.removeAttribute('data-active'));
+    };
+  });
+  return () => mm.revert();
 }
 
-/** Chapter III: backgrounds wipe up on hover (desktop) or fade in while in view (phones). */
+/** Chapter III: backgrounds wipe up on hover (desktop) or as each card scrolls in (phones). */
 export function initServices({ reduce }: { reduce: boolean }) {
   const mm = gsap.matchMedia();
   const items = $$('[data-svc]');
@@ -148,20 +168,25 @@ export function initServices({ reduce }: { reduce: boolean }) {
     return () => cleanups.forEach((fn) => fn());
   });
 
+  // Phones: each picture wipes up as its card comes in, then drifts slower than the page.
   mm.add(MOBILE, () => {
+    if (reduce) return undefined;
     const triggers: ScrollTrigger[] = [];
     items.forEach((svc) => {
       const bg = $('[data-svc-bg]', svc);
       const media = $('[data-svc-media]', svc);
       if (!bg || !media) return;
-      if (reduce) { gsap.set(bg, { autoAlpha: 1 }); return; }
-      gsap.set(bg, { autoAlpha: 0 });
-      const tl = gsap.timeline({ paused: true })
-        .to(bg, { autoAlpha: 1, duration: 0.8, ease: 'power3.out' }, 0)
-        .to(media, { scale: 1.2, duration: 0.8, ease: 'power3.out' }, 0);
-      triggers.push(ScrollTrigger.create({ trigger: svc, start: 'bottom bottom', end: 'top top', toggleActions: 'play reverse play reverse', animation: tl }));
+      const wipe = gsap.fromTo(bg, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none' });
+      const drift = gsap.fromTo(media, { yPercent: -8 }, { yPercent: 8, ease: 'none' });
+      triggers.push(
+        ScrollTrigger.create({ trigger: svc, start: 'top bottom', end: 'top 35%', scrub: true, animation: wipe }),
+        ScrollTrigger.create({ trigger: svc, start: 'top bottom', end: 'bottom top', scrub: true, animation: drift }),
+      );
     });
-    return () => triggers.forEach((st) => st.kill());
+    return () => {
+      triggers.forEach((st) => st.kill());
+      gsap.set(items.flatMap((svc) => [$('[data-svc-bg]', svc), $('[data-svc-media]', svc)]).filter(Boolean), { clearProps: 'all' });
+    };
   });
 
   return () => mm.revert();

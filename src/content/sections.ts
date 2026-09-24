@@ -16,12 +16,16 @@ export const work: WorkSection = {
     webm: '/assets/video/work-reel.webm',
     mp4: '/assets/video/work-reel.mp4',
     poster: '/assets/video/work-reel-poster.jpg',
+    portraitWebm: '/assets/video/work-reel-portrait.webm',
+    portraitMp4: '/assets/video/work-reel-portrait.mp4',
   },
   chapter: 'Chapter II',
   label: 'Selected work',
   note: '❋ Each project opens a full case study',
-  cta: 'Start reading',
+  allLabel: 'View all work',
 };
+
+const serviceImage = (name: string, alt: string) => ({ src: `/assets/shots/service-${name}.webp`, alt, width: 1000, height: 1400 });
 
 export const services: ServicesSection = {
   chapter: 'Chapter III',
@@ -32,33 +36,25 @@ export const services: ServicesSection = {
       title: ['Frontend', 'engineering'],
       description: 'Interfaces that load fast, stay accessible and hold up as the product grows.',
       tools: 'React · Next.js · Astro · TypeScript',
-      cover: { variant: 'dash' },
+      image: serviceImage('frontend', 'A dashboard on a phone'),
     },
     {
       title: ['Backend', '& APIs'],
       description: 'Typed, documented services with data models that still make sense a year later.',
       tools: 'Go · Node.js · Python · PostgreSQL',
-      cover: { variant: 'search', query: 'GET /v1/payments?status=failed', tags: ['200', '38 ms', 'JSON'] },
+      image: serviceImage('backend', 'An API client on a laptop'),
     },
     {
       title: ['Performance', '& accessibility'],
       description: 'Audits and fixes for slow or hard-to-use products, from Core Web Vitals to screen readers.',
       tools: 'Lighthouse · axe · WCAG 2.2',
-      cover: { variant: 'shop' },
+      image: serviceImage('performance', 'A storefront seen up close'),
     },
     {
       title: ['Infrastructure', '& delivery'],
       description: 'CI pipelines, containers and edge deploys, so shipping on a Friday is uneventful.',
       tools: 'Docker · GitHub Actions · Cloudflare · AWS',
-      cover: {
-        variant: 'term',
-        lines: [
-          { command: '$ git push origin main' },
-          { text: '✓ lint   ✓ test   ✓ build' },
-          { stamp: 'deploy', text: 'edge · 42 regions' },
-          { tag: 'live', tone: 'warn', text: 'in 38s' },
-        ],
-      },
+      image: serviceImage('infrastructure', 'A deploy log on a monitor'),
     },
   ],
 };
@@ -87,6 +83,7 @@ export const darkroom: DarkroomSection = {
 export const footer: FooterSection = {
   titleLines: ['Next', 'Chapter'],
   contactLabel: 'Say hello at',
+  socialLabel: 'Social',
   sign: 'Where ideas become\nshipped software',
   credit: 'Designed and built by hand',
 };

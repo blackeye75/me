@@ -9,6 +9,8 @@ export function TheWork({ work }: { work: WorkSection }) {
       <div className={styles.reveal} data-mw-rect aria-hidden="true">
         <div className={styles.inner} data-mw-inner>
           <video className={styles.video} poster={work.reel.poster} autoPlay muted loop playsInline preload="auto" data-mw-video>
+            <source media="(max-width: 767px)" src={work.reel.portraitWebm} type="video/webm" />
+            <source media="(max-width: 767px)" src={work.reel.portraitMp4} type="video/mp4" />
             <source src={work.reel.webm} type="video/webm" />
             <source src={work.reel.mp4} type="video/mp4" />
           </video>

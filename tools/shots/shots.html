@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Project shots</title>
+<!-- Source for the pictures in public/assets/shots. Each picture is one scene drawn by draw(spec) below;
+     scenes.mjs lists them and render.mjs saves each as WebP. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Geist:wght@300..600&family=Geist+Mono:wght@400&display=swap">
+<link rel="stylesheet" href="../covers.css">
+<style>
+  :root {
+    --serif: "Instrument Serif", "Times New Roman", serif;
+    --sans: "Geist", Arial, sans-serif;
+    --mono: "Geist Mono", ui-monospace, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; overflow: hidden; background: #111; }
+  i, b { display: block; font-style: normal; }
+
+  .scene { position: absolute; inset: 0; overflow: hidden; --floor: 70%; }
+  .scene > * { position: absolute; }
+  .wall { inset: 0 0 calc(100% - var(--floor)) 0; background: var(--wall); }
+  .floor { inset: var(--floor) 0 0 0; background: var(--floor-bg); }
+  .floor::before { content: ""; position: absolute; inset: 0; background: var(--grain, none); }
+  .floor::after { content: ""; position: absolute; inset: 0 0 auto; height: calc(var(--u) * .4); background: rgba(255, 255, 255, .18); }
+  .light { inset: 0; background: var(--light, none); mix-blend-mode: soft-light; pointer-events: none; }
+  .blinds { inset: 0; background: repeating-linear-gradient(112deg, rgba(0, 0, 0, .07) 0 calc(var(--u) * 5), transparent calc(var(--u) * 5) calc(var(--u) * 11));
+    -webkit-mask: radial-gradient(60% 55% at 78% 30%, #000 20%, transparent 70%); mask: radial-gradient(60% 55% at 78% 30%, #000 20%, transparent 70%); }
+  .noise { inset: 0; opacity: .1; mix-blend-mode: overlay; pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .vignette { inset: 0; background: radial-gradient(120% 100% at 50% 45%, transparent 55%, rgba(0, 0, 0, .35)); pointer-events: none; }
+
+  /* ---------- Environments ---------- */
+  .env-sun { --wall: linear-gradient(170deg, var(--t1), var(--t2)); --floor-bg: linear-gradient(180deg, #e3cba6, #c9a778);
+    --grain: repeating-linear-gradient(90deg, rgba(120, 80, 30, .07) 0 calc(var(--u) * .25), transparent 0 calc(var(--u) * 1.9));
+    --light: radial-gradient(70% 60% at 22% 18%, rgba(255, 255, 255, .7), transparent 70%); }
+  .env-warm { --wall: linear-gradient(175deg, #ebe3d7, #d5c8b6); --floor-bg: linear-gradient(180deg, #b98451, #8f5f34);
+    --grain: repeating-linear-gradient(90deg, rgba(60, 30, 10, .12) 0 calc(var(--u) * .3), transparent 0 calc(var(--u) * 2.4));
+    --light: radial-gradient(60% 55% at 25% 20%, rgba(255, 244, 225, .8), transparent 70%); }
+  .env-stone { --wall: linear-gradient(170deg, #8a8a84, #5f605b); --floor-bg: linear-gradient(180deg, #4a4a46, #2f302d);
+    --grain: radial-gradient(circle at 30% 40%, rgba(255, 255, 255, .05) 0 1px, transparent 2px) 0 0 / calc(var(--u) * 2) calc(var(--u) * 2);
+    --light: radial-gradient(60% 50% at 30% 15%, rgba(255, 255, 255, .45), transparent 70%); }
+  .env-night { --wall: radial-gradient(70% 60% at 50% 40%, color-mix(in srgb, var(--glow) 30%, #0c1012), #07090a 75%); --floor-bg: linear-gradient(180deg, #121517, #060708);
+    --grain: linear-gradient(180deg, color-mix(in srgb, var(--glow) 16%, transparent), transparent 40%); }
+
+  /* ---------- Laptop ---------- */
+  .laptop { left: 50%; bottom: calc(100% - var(--floor)); width: var(--lw, calc(var(--u) * 100)); transform: translateX(-50%); }
+  .lid { position: relative; aspect-ratio: 16 / 10.6; padding: calc(var(--lw-u) * 2.4) calc(var(--lw-u) * 2.2) calc(var(--lw-u) * 3.2);
+    border-radius: calc(var(--lw-u) * 2.4) calc(var(--lw-u) * 2.4) calc(var(--lw-u) * .6) calc(var(--lw-u) * .6);
+    background: #0f0f10; box-shadow: 0 0 0 calc(var(--lw-u) * .35) #b9babd, 0 calc(var(--lw-u) * 3) calc(var(--lw-u) * 6) calc(var(--lw-u) * -2) rgba(0, 0, 0, .45); }
+  .lid::after { content: ""; position: absolute; left: 50%; top: calc(var(--lw-u) * .9); width: calc(var(--lw-u) * .7); aspect-ratio: 1; border-radius: 50%; background: #262628; transform: translateX(-50%); }
+  .screen { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: calc(var(--lw-u) * .4); }
+  .screen::after { content: ""; position: absolute; inset: 0; background: linear-gradient(115deg, rgba(255, 255, 255, .14), transparent 38%); pointer-events: none; }
+  .base { position: relative; left: 50%; width: 112%; height: calc(var(--lw-u) * 2.6); transform: translateX(-50%);
+    border-radius: 0 0 calc(var(--lw-u) * 2) calc(var(--lw-u) * 2) / 0 0 calc(var(--lw-u) * 1.4) calc(var(--lw-u) * 1.4);
+    background: linear-gradient(180deg, #e4e5e8, #b7b8bc 55%, #8d8e92); }
+  .base::before { content: ""; position: absolute; left: 50%; top: 0; width: 14%; height: 40%; border-radius: 0 0 calc(var(--lw-u) * .8) calc(var(--lw-u) * .8); background: #a6a7ab; transform: translateX(-50%); }
+  .shadow { position: absolute; left: -10%; right: -10%; bottom: calc(var(--u) * -3.2); height: calc(var(--u) * 5); border-radius: 50%; background: rgba(0, 0, 0, .45); filter: blur(calc(var(--u) * 1.8)); z-index: -1; }
+
+  .cup { left: 79%; bottom: calc(100% - var(--floor) - var(--u) * .6); width: calc(var(--u) * 6.4); height: calc(var(--u) * 7.4); border-radius: calc(var(--u) * .5) calc(var(--u) * .5) calc(var(--u) * 1.6) calc(var(--u) * 1.6);
+    background: linear-gradient(90deg, #cfc6b8, #f4efe7 40%, #d8cfc2); box-shadow: calc(var(--u) * 1.4) calc(var(--u) * .8) calc(var(--u) * 2) rgba(0, 0, 0, .25); }
+  .cup::after { content: ""; position: absolute; right: calc(var(--u) * -2.2); top: 22%; width: calc(var(--u) * 2.6); height: 44%; border: calc(var(--u) * .8) solid #e3dbcf; border-left: 0; border-radius: 0 50% 50% 0; }
+
+  /* ---------- Monitor ---------- */
+  .monitor { left: 50%; bottom: calc(100% - var(--floor)); width: var(--lw, calc(var(--u) * 104)); transform: translateX(-50%); }
+  .monitor .panel { position: relative; aspect-ratio: 16 / 9.4; padding: calc(var(--lw-u) * 1.1); border-radius: calc(var(--lw-u) * 1.4); background: #151617;
+    box-shadow: 0 0 0 calc(var(--lw-u) * .3) #3a3b3e, 0 0 calc(var(--lw-u) * 18) calc(var(--lw-u) * 2) color-mix(in srgb, var(--glow) 40%, transparent); }
+  .neck { position: relative; left: 50%; width: 12%; height: calc(var(--lw-u) * 16); transform: translateX(-50%); background: linear-gradient(90deg, #6b6c70, #c9cacd 45%, #7c7d81); }
+  .foot { position: relative; left: 50%; width: 36%; height: calc(var(--lw-u) * 1.6); transform: translateX(-50%); border-radius: calc(var(--lw-u) * .6); background: linear-gradient(180deg, #d4d5d8, #85868a); }
+  .keys { position: absolute; left: 50%; bottom: calc(100% - var(--floor) - var(--u) * 7); width: calc(var(--u) * 62); height: calc(var(--u) * 5); transform: translateX(-60%) perspective(calc(var(--u) * 40)) rotateX(55deg);
+    border-radius: calc(var(--u) * .8); background: #d9dadd; box-shadow: 0 calc(var(--u) * 1) calc(var(--u) * 2) rgba(0, 0, 0, .5); }
+  .env-night .keys { background: #2a2c2f; }
+
+  /* ---------- Phone on a plinth ---------- */
+  .plinth { left: 50%; bottom: 0; width: calc(var(--u) * 58); height: calc(100% - var(--floor) + var(--u) * 6); transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--p1, #bfa582), var(--p2, #e6d3b6) 45%, var(--p1, #bfa582)); }
+  .plinth::before { content: ""; position: absolute; left: 0; right: 0; top: calc(var(--u) * -3.5); height: calc(var(--u) * 7); border-radius: 50%; background: var(--p3, #efe2cc); }
+  .phone { left: 50%; bottom: calc(100% - var(--floor) + var(--u) * 4.5); width: calc(var(--u) * 31); aspect-ratio: 9 / 19.2; transform: translateX(-50%) rotate(var(--tilt, -8deg)); transform-origin: 50% 100%;
+    padding: calc(var(--u) * 1.3); border-radius: calc(var(--u) * 6.4); background: #18181a;
+    box-shadow: 0 0 0 calc(var(--u) * .45) #9c9da1, calc(var(--u) * 3) calc(var(--u) * 5) calc(var(--u) * 8) calc(var(--u) * -2) rgba(0, 0, 0, .55); }
+  .screen:not([class*="cover--"]) { --cv-panel: #FFFFFF; --cv-ink: #1B2140; --cv-hi: #2F3CF5; }
+  .phone .screen { color: var(--cv-ink); border-radius: calc(var(--u) * 5.2); display: flex; flex-direction: column; background: var(--cv-panel, #fff); }
+  .island { position: absolute; z-index: 2; left: 50%; top: calc(var(--u) * 2.6); width: 30%; height: calc(var(--u) * 3.2); border-radius: 99px; background: #050505; transform: translateX(-50%); }
+  .status { display: flex; justify-content: space-between; padding: calc(var(--u) * 2.6) calc(var(--u) * 5) calc(var(--u) * 1); font: 600 calc(var(--u) * 1.9)/1 var(--sans); }
+  .status i { width: calc(var(--u) * 6); height: calc(var(--u) * 1.6); border-radius: 99px; background: currentColor; opacity: .75; }
+  .app { display: flex; align-items: center; justify-content: space-between; padding: calc(var(--u) * 2.4) calc(var(--u) * 4) calc(var(--u) * .8); font: 500 calc(var(--u) * 3.6)/1 var(--sans); letter-spacing: -.02em; }
+  .app i { width: calc(var(--u) * 8); height: calc(var(--u) * 3); border-radius: 99px; background: var(--cv-hi); }
+
+  /* Covers stretched to fill a screen */
+  .screen .cover { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; padding: 3.4% 4% 0; }
+  .phone .cover { flex: 1; padding: 0; background: var(--cv-panel); }
+  .phone .cv-win { border-radius: 0; box-shadow: none; padding: 3cqw 7cqw 6cqw; gap: 5cqw; }
+  .phone .cv-bar { display: none; }
+  .phone .cv-kpis { grid-template-columns: 1fr 1fr; gap: 4cqw; }
+  .phone .cv-kpis i { height: 20cqw; border-radius: 4cqw; }
+  .phone .cv-kpis i:nth-child(3) { grid-column: span 2; height: 12cqw; }
+  .phone .cv-chart { gap: 2.4cqw; }
+  .phone .cv-rows { gap: 4cqw; }
+  .phone .cv-rows i { height: 4cqw; }
+  .phone .cv-term { font-size: 4.2cqw; gap: 2.6cqw; }
+  .phone .cv-grid { grid-template-columns: 1fr 1fr; gap: 4cqw; }
+  .phone .cv-tile:nth-child(3) { grid-column: span 2; }
+  .phone .cv-nav i { height: 4cqw; }
+  .phone .cv-node { font-size: 4.6cqw; padding: 2.6cqw 4cqw; }
+  .phone .cv-cursor-tag { font-size: 3.6cqw; padding: 1.6cqw 3cqw; }
+  .phone .cv-query { font-size: 4cqw; padding: 3.6cqw 5cqw; }
+  .phone .cv-result i { height: 3.4cqw; }
+  .phone .cv-result b { font-size: 3.2cqw; padding: 1.6cqw 2.6cqw; }
+
+  /* ---------- Close-up of a screen ---------- */
+  .closeup { left: 50%; top: 50%; width: calc(var(--u) * 150); transform: translate(-44%, -48%) perspective(calc(var(--u) * 180)) rotateY(-24deg) rotateX(9deg) rotateZ(-3deg); }
+  .closeup .lid { box-shadow: 0 0 0 calc(var(--lw-u) * .35) #b9babd, calc(var(--u) * -4) calc(var(--u) * 6) calc(var(--u) * 10) rgba(0, 0, 0, .5); }
+
+  /* ---------- Hobbies (small line pictures) ---------- */
+  .hobby { inset: 0; display: grid; place-items: center; background: var(--h-bg); }
+  .hobby svg { width: 70%; height: auto; overflow: visible; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+/* One entry per project cover, drawn at its final state. */
+const covers = {
+  dash: `<span class="cover cover--dash"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-kpis"><i></i><i></i><i></i></span><span class="cv-chart">${[38, 52, 44, 70, 58, 82, 66, 92, 74, 88].map((h) => `<i style="--h:${h}%"></i>`).join('')}</span><span class="cv-rows"><i></i><i></i><i></i></span></span></span>`,
+  term: `<span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b>$ tidepool api.log --where level=error</b><span><em>12:04:31</em> <s>ERROR</s> payment timeout id=8f2c</span><span><em>12:04:33</em> <u>WARN</u> retry 2/3 id=8f2c</span><span><em>12:04:35</em> INFO settled id=8f2c 212ms</span><span><em>12:05:02</em> <s>ERROR</s> card declined id=91ab</span><span><em>12:05:09</em> INFO refund queued id=91ab</span><span><em>12:05:14</em> INFO settled id=77d0 98ms</span><b>_</b></span></span></span>`,
+  deploy: `<span class="cover cover--term"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-term"><b>$ git push origin main</b><span>✓ lint   ✓ test   ✓ build</span><span><em>deploy</em> edge · 42 regions</span><span><u>live</u> in 38s</span><b>_</b></span></span></span>`,
+  shop: `<span class="cover cover--shop"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-nav"><i></i><i></i></span><span class="cv-grid"><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span><span class="cv-tile"><i></i></span></span><span class="cv-rows"><i></i><i></i></span></span></span>`,
+  board: `<span class="cover cover--board"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-canvas"><span class="cv-node" style="--x:8%;--y:18%">Client</span><span class="cv-node" style="--x:40%;--y:50%">Relay</span><span class="cv-node" style="--x:72%;--y:18%">Store</span><span class="cv-edge" style="--x:24%;--y:34%;--w:20%;--r:32deg"></span><span class="cv-edge" style="--x:56%;--y:52%;--w:20%;--r:-32deg"></span><span class="cv-cursor-tag" style="--x:48%;--y:30%">Ana</span><span class="cv-cursor-tag cv-cursor-tag--b" style="--x:30%;--y:44%">Sam</span></span></span></span>`,
+  search: `<span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query">how do we rotate API keys?</span><span class="cv-result"><i></i><i></i><i></i><b>RFC-112</b></span><span class="cv-result"><i></i><i></i><i></i><b>OPS-481</b></span><span class="cv-result"><i></i><i></i><i></i><b>wiki</b></span></span></span>`,
+  api: `<span class="cover cover--search"><span class="cv-win"><span class="cv-bar"><i></i><i></i><i></i></span><span class="cv-query">GET /v1/payments?status=failed</span><span class="cv-result"><i></i><i></i><i></i><b>200</b></span><span class="cv-result"><i></i><i></i><i></i><b>38 ms</b></span><span class="cv-result"><i></i><i></i><i></i><b>JSON</b></span></span></span>`,
+};
+
+/* Simple line pictures for the About page's hobbies. */
+const hobbies = {
+  climbing: `<svg viewBox="0 0 200 240" fill="none" stroke="#2e2b28" stroke-width="2.2" stroke-linecap="round"><path d="M20 230 L60 10 L180 10 L150 230 Z" fill="#e6ddd0"/>${[[70, 50, '#b4582f'], [120, 40, '#2e2b28'], [95, 90, '#6e7f66'], [140, 110, '#b4582f'], [80, 140, '#d9a441'], [125, 170, '#2e2b28'], [70, 200, '#6e7f66'], [140, 205, '#d9a441']].map(([x, y, c]) => `<ellipse cx="${x}" cy="${y}" rx="9" ry="6" fill="${c}" stroke="none"/>`).join('')}<path d="M96 88 C 110 70, 118 55, 120 42" stroke-dasharray="3 5"/></svg>`,
+  camera: `<svg viewBox="0 0 220 160" fill="none" stroke="#2e2b28" stroke-width="2.2" stroke-linejoin="round"><rect x="10" y="40" width="200" height="110" rx="10" fill="#2e2b28"/><rect x="10" y="62" width="200" height="66" fill="#8a8178" stroke="none"/><path d="M40 40 V 26 H 80 V 40" fill="#2e2b28"/><rect x="150" y="26" width="34" height="14" rx="3" fill="#cfc9c1"/><circle cx="110" cy="95" r="42" fill="#1f1d1b" stroke="#cfc9c1" stroke-width="4"/><circle cx="110" cy="95" r="26" fill="#3a3632" stroke="#5f5a54"/><circle cx="100" cy="85" r="7" fill="#faf9f6" stroke="none" opacity=".6"/></svg>`,
+  keyboard: `<svg viewBox="0 0 240 150" fill="none" stroke="#2e2b28" stroke-width="2"><rect x="6" y="20" width="228" height="112" rx="10" fill="#3a3632"/>${Array.from({ length: 4 }, (_, r) => Array.from({ length: 10 }, (_, c) => `<rect x="${18 + c * 21 + (r % 2) * 5}" y="${32 + r * 22}" width="17" height="17" rx="3" fill="${(r === 1 && c === 7) ? '#b4582f' : (c > 7 ? '#8a8178' : '#edeae6')}" stroke="none"/>`).join('')).join('')}</svg>`,
+  running: `<svg viewBox="0 0 240 180" fill="none" stroke-linecap="round"><rect x="0" y="0" width="240" height="180" rx="90" fill="#b4582f"/>${[0, 1, 2, 3].map((i) => `<rect x="${14 + i * 12}" y="${14 + i * 12}" width="${212 - i * 24}" height="${152 - i * 24}" rx="${76 - i * 12}" stroke="#faf9f6" stroke-width="2"/>`).join('')}<rect x="70" y="66" width="100" height="48" rx="24" fill="#6e7f66"/></svg>`,
+};
+
+const stage = document.getElementById('stage');
+const el = (html) => { stage.innerHTML = html; };
+
+/**
+ * draw(spec): spec = { kind: 'laptop' | 'monitor' | 'phone' | 'closeup' | 'hobby', cover, env, w, h, name, ... }
+ */
+window.draw = (s) => {
+  document.documentElement.style.width = document.body.style.width = s.w + 'px';
+  document.documentElement.style.height = document.body.style.height = s.h + 'px';
+  const u = Math.min(s.w, s.h) / 100;
+  const vars = [`--u:${u}px`, `--floor:${s.floor || (s.h > s.w ? 72 : 76)}%`];
+  if (s.t1) vars.push(`--t1:${s.t1}`, `--t2:${s.t2}`);
+  if (s.glow) vars.push(`--glow:${s.glow}`);
+  if (s.plinth) vars.push(`--p1:${s.plinth[0]}`, `--p2:${s.plinth[1]}`, `--p3:${s.plinth[2]}`);
+  if (s.tilt) vars.push(`--tilt:${s.tilt}`);
+  const lw = (s.lw || 84) * u;
+  vars.push(`--lw:${lw}px`, `--lw-u:${lw / 100}px`);
+  const sunny = s.env === 'sun' || s.env === 'warm';
+  const room = `<div class="wall"></div><div class="floor"></div>${sunny ? '<div class="blinds"></div>' : ''}`;
+  const cup = sunny && s.w > s.h ? '<div class="cup"></div>' : '';
+  const finish = `<div class="light"></div><div class="noise"></div><div class="vignette"></div>`;
+  let body = '';
+  if (s.kind === 'laptop') body = `${room}<div class="laptop"><div class="lid"><div class="screen">${covers[s.cover]}</div></div><div class="base"></div><div class="shadow"></div></div>${cup}`;
+  if (s.kind === 'monitor') body = `${room}<div class="monitor"><div class="panel"><div class="screen">${covers[s.cover]}</div></div><div class="neck"></div><div class="foot"></div></div><div class="keys"></div>`;
+  if (s.kind === 'phone') body = `${room}<div class="plinth"></div><div class="phone"><span class="island"></span><div class="screen ${coverClass(s.cover)}"><div class="status"><span>9:41</span><i></i></div><div class="app"><span>${s.name}</span><i></i></div>${covers[s.cover]}</div></div>`;
+  if (s.kind === 'closeup') body = `${room}<div class="closeup" style="--lw:${150 * u}px;--lw-u:${1.5 * u}px"><div class="lid"><div class="screen">${covers[s.cover]}</div></div></div>`;
+  if (s.kind === 'hobby') { el(`<div class="scene" style="${vars.join(';')};--h-bg:${s.bg}"><div class="hobby">${hobbies[s.hobby]}</div><div class="noise"></div></div>`); return; }
+  el(`<div class="scene env-${s.env}" style="${vars.join(';')}">${body}${finish}</div>`);
+};
+
+/* The phone screen takes its colours from the cover it shows. */
+function coverClass(name) {
+  return { term: 'cover--term', deploy: 'cover--term', shop: 'cover--shop', board: 'cover--board', search: 'cover--search', api: 'cover--search' }[name] || '';
+}
+
+</script>
+</body>
+</html>

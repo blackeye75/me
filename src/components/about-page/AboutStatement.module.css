@@ -1,0 +1,15 @@
+.statement {
+  display: flex;
+  flex-direction: column;
+  gap: 44px;
+  background: var(--sand);
+  color: var(--ink);
+}
+.lead { font-size: 19px; line-height: 1.38; letter-spacing: -.01em; }
+.cols { display: grid; gap: 16px; font-size: 14px; line-height: 1.45; }
+
+@media (min-width: 768px) {
+  .statement { justify-content: space-between; padding: var(--vg) calc(4.4 * var(--s)) var(--vg) calc(8.8 * var(--s)); }
+  .lead { max-width: calc(54 * var(--s)); font-size: calc(2.1 * var(--s)); line-height: 1.36; }
+  .cols { grid-template-columns: repeat(2, calc(18.6 * var(--s))); gap: calc(1.2 * var(--s)); font-size: max(13px, calc(1.1 * var(--s))); }
+}

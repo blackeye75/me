@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import type { About as AboutData, Image as ImageData } from '@/content';
+import { Portrait } from '../portrait/Portrait';
 import { Panel, tones } from '../story/Story';
 import { Lines } from '../text/Lines';
 import styles from './About.module.css';
@@ -25,18 +25,14 @@ export function About({ about, logo }: Props) {
         <div className={styles.bottom}>
           <div className={styles.quoteCol}>
             <p className={`${styles.quote} label`} data-about-part><Lines text={about.quote} /></p>
-            <a className="link-arrow" href="#experience" data-goto="experience" data-reveal>
+            <a className={`link-arrow ${styles.more}`} href="/about" data-reveal>
               <span className="link-text">{about.moreLabel}</span> <span aria-hidden="true">→</span>
             </a>
           </div>
           <figure className={styles.portrait} data-image-reveal>
             <span className={styles.overlay} data-ir-overlay />
             <span className={styles.media} data-ir-media>
-              <span className={styles.placeholder} role="img" aria-label={about.portraitAlt}>
-                <span className={styles.head}>
-                  <Image src={logo.src} alt="" width={logo.width} height={logo.height} sizes="(min-width: 768px) 16vw, 200px" />
-                </span>
-              </span>
+              <Portrait logo={logo} alt={about.portraitAlt} sizes="(min-width: 768px) 16vw, 70vw" />
             </span>
           </figure>
         </div>

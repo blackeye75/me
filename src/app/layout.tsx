@@ -29,20 +29,25 @@ export const viewport: Viewport = {
 
 /*
  * Runs before first paint: sets the layout and motion classes on <html> so
- * nothing flashes, and starts the intro at the top of the page. If the motion
- * script never arrives, the safety timer removes them and shows everything.
+ * nothing flashes. The home page starts with its intro; other pages start
+ * behind the curtain, which lifts once the motion layer is ready. If the
+ * motion script never arrives, the safety timer removes it all.
  */
 const bootScript = `(function () {
   var root = document.documentElement;
-  if (location.pathname !== '/') return;
-  root.classList.add('js', 'has-h');
+  var path = location.pathname.replace(/\\/+$/, '') || '/';
+  var home = path === '/';
+  var sideways = home || path === '/about' || path === '/works';
+  if (!sideways && !/^\\/works\\/[^/]+$/.test(path)) return;
+  root.classList.add('js');
+  if (sideways) root.classList.add('has-h');
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    root.classList.add('motion', 'is-intro');
+    root.classList.add('motion', home && !location.hash ? 'is-intro' : 'is-entering');
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0, 0);
   }
   setTimeout(function () {
-    if (!root.classList.contains('motion-ready')) root.classList.remove('is-intro', 'motion', 'has-h');
+    if (!root.classList.contains('motion-ready')) root.classList.remove('is-intro', 'is-entering', 'motion', 'has-h');
   }, 4000);
 })();`;
 

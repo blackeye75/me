@@ -65,19 +65,6 @@ export type About = {
   portraitAlt: string;
 };
 
-/* ---------- Project covers (CSS-drawn thumbnails) ---------- */
-
-export type TermLine =
-  | { command: string }
-  | { stamp?: string; tag?: string; tone?: 'error' | 'warn' | 'info'; text: string };
-
-export type Cover =
-  | { variant: 'dash' }
-  | { variant: 'term'; lines: TermLine[] }
-  | { variant: 'shop' }
-  | { variant: 'board' }
-  | { variant: 'search'; query: string; tags: string[] };
-
 /* ---------- Projects and case studies ---------- */
 
 export type ProjectStatus = 'live' | 'oss' | 'archived';
@@ -101,25 +88,36 @@ export type CaseStudy = {
   outcome: string;
 };
 
+export type ProjectImages = {
+  /** Landscape picture: work lists, the case study header. */
+  hero: Image;
+  /** Portrait picture: the tall cards on the works page. */
+  tall: Image;
+  /** A close-up, used in the case study. */
+  detail: Image;
+};
+
 export type Project = {
-  /** Used as the URL hash that opens the case study, e.g. #kiln. */
+  /** The case study lives at /works/<slug>. */
   slug: string;
   name: string;
   category: string;
   year: number;
   status: ProjectStatus;
   statusLabel: string;
-  cover: Cover;
+  images: ProjectImages;
   caseStudy: CaseStudy;
 };
 
 export type WorkSection = {
   intro: { before: string; after: string };
-  reel: { webm: string; mp4: string; poster: string };
+  /** The work reel, plus a portrait version for phones. */
+  reel: { webm: string; mp4: string; poster: string; portraitWebm: string; portraitMp4: string };
   chapter: string;
   label: string;
   note: string;
-  cta: string;
+  /** Link to the works page under the list. */
+  allLabel: string;
 };
 
 export type Service = {
@@ -127,7 +125,8 @@ export type Service = {
   title: string[];
   description: string;
   tools: string;
-  cover: Cover;
+  /** Background picture: shown on hover (desktop) or behind the card (phones). */
+  image: Image;
 };
 
 export type ServicesSection = {
@@ -164,11 +163,60 @@ export type DarkroomSection = {
 export type FooterSection = {
   titleLines: string[];
   contactLabel: string;
+  /** Heading over the social links (phones). */
+  socialLabel: string;
   sign: string;
   credit: string;
 };
 
-export type NavItem = { label: string; target: string };
+/** A menu entry. `href` is a page ("/about") or a place on the home page ("/#contact"). */
+export type NavItem = { label: string; href: string };
+
+/* ---------- Pages ---------- */
+
+export type CareerItem = { period: string; role: string; company: string };
+
+export type AboutPage = {
+  label: string;
+  intro: string;
+  portraitAlt: string;
+  statement: string;
+  paragraphs: string[];
+  philosophy: { label: string; quote: string };
+  career: { title: string[]; note: string; items: CareerItem[] };
+  beyond: {
+    /** Text before the list of hobbies, e.g. "Beyond code:". */
+    lead: string;
+    /** Each hobby shows its picture while hovered. */
+    hobbies: { label: string; image: Image }[];
+    /** Text after the list. */
+    tail: string;
+    image: Image;
+    availability: string;
+    emailLabel: string;
+  };
+};
+
+export type WorksPage = {
+  title: string;
+  intro: string;
+  labels: {
+    back: string;
+    overview: string;
+    details: string;
+    client: string;
+    year: string;
+    role: string;
+    stack: string;
+    preview: string;
+    problem: string;
+    approach: string;
+    decisions: string;
+    code: string;
+    outcome: string;
+    next: string;
+  };
+};
 
 export type SiteContent = {
   profile: Profile;
@@ -181,4 +229,6 @@ export type SiteContent = {
   experience: ExperienceSection;
   darkroom: DarkroomSection;
   footer: FooterSection;
+  aboutPage: AboutPage;
+  worksPage: WorksPage;
 };

@@ -1,4 +1,11 @@
-import type { Project } from './types';
+import type { Project, ProjectImages } from './types';
+
+/** Pictures rendered by tools/shots for each project. */
+const shots = (slug: string, name: string): ProjectImages => ({
+  hero: { src: `/assets/shots/${slug}-hero.webp`, alt: `${name} on a laptop screen`, width: 1600, height: 1000 },
+  tall: { src: `/assets/shots/${slug}-tall.webp`, alt: `${name} on a phone`, width: 1200, height: 1500 },
+  detail: { src: `/assets/shots/${slug}-detail.webp`, alt: `A close-up of the ${name} interface`, width: 1600, height: 1000 },
+});
 
 export const projects: Project[] = [
   {
@@ -8,7 +15,7 @@ export const projects: Project[] = [
     year: 2026,
     status: 'live',
     statusLabel: 'Live',
-    cover: { variant: 'dash' },
+    images: shots('ledgerline', 'Ledgerline'),
     caseStudy: {
       overview: 'A real-time treasury dashboard that shows finance teams every incoming and outgoing payment the moment it settles.',
       client: 'Bluefin Payments',
@@ -46,17 +53,7 @@ export const projects: Project[] = [
     year: 2025,
     status: 'oss',
     statusLabel: 'Open source',
-    cover: {
-      variant: 'term',
-      lines: [
-        { command: '$ tidepool api.log --where level=error' },
-        { stamp: '12:04:31', tag: 'ERROR', tone: 'error', text: 'payment timeout id=8f2c' },
-        { stamp: '12:04:33', tag: 'WARN', tone: 'warn', text: 'retry 2/3 id=8f2c' },
-        { stamp: '12:04:35', text: 'INFO settled id=8f2c 212ms' },
-        { stamp: '12:05:02', tag: 'ERROR', tone: 'error', text: 'card declined id=91ab' },
-        { stamp: '12:05:09', text: 'INFO refund queued id=91ab' },
-      ],
-    },
+    images: shots('tidepool', 'Tidepool'),
     caseStudy: {
       overview: 'A fast terminal log viewer that tails, filters and searches gigabytes of structured logs without leaving the keyboard.',
       client: 'Personal open-source project',
@@ -95,7 +92,7 @@ export const projects: Project[] = [
     year: 2025,
     status: 'live',
     statusLabel: 'Live',
-    cover: { variant: 'shop' },
+    images: shots('kiln', 'Kiln'),
     caseStudy: {
       overview: 'A headless storefront for an independent ceramics studio whose collections sell out within hours of release.',
       client: 'Kiln Ceramics Studio',
@@ -133,7 +130,7 @@ export const projects: Project[] = [
     year: 2024,
     status: 'archived',
     statusLabel: 'Archived',
-    cover: { variant: 'board' },
+    images: shots('relay', 'Relay'),
     caseStudy: {
       overview: 'A multiplayer whiteboard where distributed teams sketch system diagrams together in real time.',
       client: 'Studio Ferro (internal tool)',
@@ -169,7 +166,7 @@ export const projects: Project[] = [
     year: 2024,
     status: 'live',
     statusLabel: 'Live',
-    cover: { variant: 'search', query: 'how do we rotate API keys?', tags: ['RFC-112', 'OPS-481', 'wiki'] },
+    images: shots('fieldnote', 'Fieldnote'),
     caseStudy: {
       overview: 'Semantic search across an engineering team’s docs, tickets and RFCs, with every answer linked to its source.',
       client: 'Northstar Labs',

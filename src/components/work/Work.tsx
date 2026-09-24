@@ -1,5 +1,5 @@
+import Image from 'next/image';
 import type { Project, WorkSection } from '@/content';
-import { Cover } from '../cover/Cover';
 import { cornerClass, Panel, tones } from '../story/Story';
 import styles from './Work.module.css';
 
@@ -8,10 +8,8 @@ type Props = {
   projects: Project[];
 };
 
-/** Chapter II. Each project name opens its case study. */
+/** Chapter II. Each project links to its case study; on desktop a name shows its picture on hover. */
 export function Work({ work, projects }: Props) {
-  const first = projects[0];
-
   return (
     <Panel id="work" className={styles.work} tone={tones.sand} aria-labelledby="work-title">
       <p className={`chapter ${cornerClass}`} data-reveal>{work.chapter}</p>
@@ -20,7 +18,7 @@ export function Work({ work, projects }: Props) {
         <span className={styles.placeholder} data-work-ph />
         {projects.map((project) => (
           <span key={project.slug} className={styles.img} data-work-img>
-            <Cover cover={project.cover} className={styles.fill} />
+            <Image src={project.images.hero.src} alt="" fill sizes="(min-width: 768px) 40vw, 1px" className={styles.fill} />
           </span>
         ))}
       </div>
@@ -30,7 +28,7 @@ export function Work({ work, projects }: Props) {
         <ol className={styles.list} data-work-list>
           {projects.map((project, i) => (
             <li key={project.slug} className={styles.item} data-work-item>
-              <a className={styles.link} href={`#${project.slug}`} data-case={project.slug}>
+              <a className={styles.link} href={`/works/${project.slug}`}>
                 <span className="mask"><span className={styles.name} data-rise>{project.name}</span></span>
                 <span className={styles.meta}>{project.category} · {project.year}</span>
                 <span className={styles.arrow} aria-hidden="true">↗</span>
@@ -41,12 +39,10 @@ export function Work({ work, projects }: Props) {
           ))}
         </ol>
         <div className={styles.foot}>
+          <a className={`link-arrow ${styles.all}`} href="/works" data-reveal>
+            <span className="link-text">{work.allLabel}</span> <span aria-hidden="true">→</span>
+          </a>
           <p className="label" data-reveal>{work.note}</p>
-          {first && (
-            <a className="link-arrow" href={`#${first.slug}`} data-case={first.slug} data-reveal>
-              <span className="link-text">{work.cta}</span> <span aria-hidden="true">→</span>
-            </a>
-          )}
         </div>
       </div>
     </Panel>

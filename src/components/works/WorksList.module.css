@@ -1,0 +1,56 @@
+/* All work. Phones: one column. Desktop: a row of cards at the bottom of a pinned
+   screen, alternating wide and tall, which slides sideways with the scroll. */
+
+.works {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: calc(var(--bar) + 24px) 20px 56px;
+  background: var(--sand);
+  color: var(--ink);
+}
+.head { display: flex; align-items: flex-start; gap: 6px; }
+.title { font: 400 15vw/.9 var(--serif); text-transform: uppercase; letter-spacing: -.01em; }
+.line { display: block; }
+.count { font: 400 7vw/1 var(--serif); }
+
+.row { list-style: none; margin: 40px 0 0; padding: 0; display: grid; gap: 36px; }
+.link { display: grid; gap: 12px; text-decoration: none; }
+.media { position: relative; display: block; aspect-ratio: 1.27; overflow: hidden; background: #dcd5cb; }
+.card[data-tall] .media { aspect-ratio: .87; }
+.img { object-fit: cover; transition: transform 1.2s cubic-bezier(.16, 1, .3, 1); }
+.caption { display: flex; align-items: flex-end; gap: 10px; }
+.num { font: 400 44px/.8 var(--serif); letter-spacing: -.02em; }
+.text { display: grid; gap: 4px; padding-bottom: 2px; }
+.cat { font: 400 10px/1 var(--sans); text-transform: uppercase; letter-spacing: .02em; }
+.name { font-size: 17px; line-height: 1.1; }
+
+@media (hover: hover) {
+  .link:hover .img { transform: scale(1.05); }
+  .link:hover .name { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+}
+
+@media (min-width: 768px) {
+  .works { padding: var(--vg) var(--vg) var(--vg) calc(var(--rail) + 4.4 * var(--s)); }
+  .head { justify-content: space-between; }
+  .title { font-size: calc(14 * var(--s)); line-height: .82; }
+  .count { font-size: calc(14 * var(--s)); line-height: .82; }
+  .row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: calc(3.2 * var(--s)) calc(2.4 * var(--s)); margin-top: calc(12 * var(--s)); }
+  .card { width: calc(29.4 * var(--s)); flex-shrink: 0; }
+  .num { font-size: calc(5 * var(--s)); }
+  .cat { font-size: max(10px, calc(.8 * var(--s))); }
+  .name { font-size: max(14px, calc(1.2 * var(--s))); }
+  .caption { gap: calc(1.1 * var(--s)); }
+
+  /* With JavaScript: one screen, the row pinned along the bottom half */
+  :global(.has-h) .works { height: 100vh; height: 100svh; overflow: hidden; }
+  :global(.has-h) .row {
+    position: absolute;
+    top: 47%;
+    left: calc(var(--rail) + 4.4 * var(--s));
+    flex-wrap: nowrap;
+    margin: 0;
+    padding-right: var(--vg);
+    will-change: transform;
+  }
+}

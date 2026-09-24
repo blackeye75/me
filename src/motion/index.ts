@@ -1,18 +1,21 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
-import { initCaseStudies } from './case-studies';
+import { initAbout } from './about';
 import { initClock } from './clock';
 import { createDarkroom } from './darkroom';
 import { $, $$, createDisposer, isDesktop, prefersReducedMotion } from './dom';
-import { initExperienceHover, initServices, initWorkHover } from './hovers';
+import { playEntrance, prepEntrance } from './enter';
+import { initExperience, initServices, initWorkHover } from './hovers';
 import { runIntro } from './intro';
 import { createMenu } from './menu';
 import { createRail } from './rail';
 import { initReveals } from './reveals';
 import { createScroll } from './scroll';
 import { createStory } from './story';
+import { createTransitions } from './transitions';
 import { createWorkWindow } from './work-window';
+import { initWorks } from './works';
 
 /** Resolves when web fonts are ready (or after 2.5 s), so measurements are final. */
 const whenFontsReady = () => new Promise<void>((resolve) => {
@@ -23,7 +26,8 @@ const whenFontsReady = () => new Promise<void>((resolve) => {
 /**
  * Starts every scroll and hover effect on the page and returns a function that
  * undoes all of it. Everything is found through data-* attributes, so the
- * components stay plain server-rendered markup.
+ * components stay plain server-rendered markup, and each page only gets the
+ * effects whose markup it contains.
  */
 export function initMotion(): () => void {
   gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -43,8 +47,11 @@ export function initMotion(): () => void {
   if (reel && reduce) { reel.removeAttribute('autoplay'); reel.pause(); }
 
   const scroll = createScroll({ smooth: motion, reduce });
+  const transitions = createTransitions({ dispose, reduce });
   const workWindow = createWorkWindow();
   const darkroom = createDarkroom();
+  /** Pages built as a sideways story (home, about) versus ordinary scrolling pages. */
+  const hasStory = Boolean($('[data-pin]'));
 
   let story!: ReturnType<typeof createStory>;
   let rail!: ReturnType<typeof createRail>;
@@ -52,13 +59,15 @@ export function initMotion(): () => void {
 
   ctx.add(() => {
     story = createStory({ reduce, scroll, workWindow, darkroom });
+    cleanups.push(initWorks({ reduce }));
     rail = createRail({ dispose, workWindow, darkroom });
     menu = createMenu({ dispose, motion, reduce, scroll, rail, targetY: story.targetY });
-    initCaseStudies({ dispose, scroll, closeMenu: () => menu.close() });
     initWorkHover({ dispose, reduce, rail, isMenuOpen: menu.isOpen });
-    initExperienceHover({ dispose });
+    cleanups.push(initExperience({ dispose }));
     cleanups.push(initServices({ reduce }));
+    cleanups.push(initAbout({ dispose, reduce, storyTimeline: story.timeline }));
     initClock({ dispose });
+    if (motion) prepEntrance();
   });
 
   // Keyboard users: bring a focused element's panel into view on desktop.
@@ -74,13 +83,27 @@ export function initMotion(): () => void {
     });
   }
 
+  // Old links to case studies (/#kiln) now go to the project's page.
+  const hash = decodeURIComponent(window.location.hash.slice(1));
+  if (hash && !document.getElementById(hash) && $(`a[href="/works/${CSS.escape(hash)}"]`)) {
+    window.location.replace(`/works/${hash}`);
+  }
+
   whenFontsReady().then(() => {
     if (disposed) return;
     ctx.add(() => {
       story.rebuild();
       ScrollTrigger.refresh();
+
+      // Arriving at a section of the home page from another page (/#contact).
+      // Runs once everything is measured, so nothing moves the page afterwards.
+      const jumpToHash = () => {
+        if (hash && document.getElementById(hash)) requestAnimationFrame(() => scroll.scrollTo(story.targetY(hash), { immediate: true }));
+      };
+
       if (!motion) {
         $('[data-clients-list]')?.setAttribute('data-interactive', '');
+        jumpToHash();
         return;
       }
       if (root.classList.contains('is-intro')) {
@@ -96,8 +119,11 @@ export function initMotion(): () => void {
             rail.request();
           },
         });
+      } else {
+        transitions.enter(() => playEntrance());
       }
-      cleanups.push(initReveals(story.timeline));
+      cleanups.push(initReveals(hasStory ? story.timeline : null));
+      jumpToHash();
     });
   });
 
@@ -110,6 +136,6 @@ export function initMotion(): () => void {
     ScrollTrigger.getAll().forEach((t) => t.kill());
     scroll.destroy();
     $$('[data-clients-list]').forEach((el) => el.removeAttribute('data-interactive'));
-    root.classList.remove('motion-ready', 'menu-open', 'case-open');
+    root.classList.remove('motion-ready', 'menu-open');
   };
 }

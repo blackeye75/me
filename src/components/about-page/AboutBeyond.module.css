@@ -1,0 +1,47 @@
+.beyond {
+  display: flex;
+  flex-direction: column;
+  background: var(--sand);
+  color: var(--ink);
+}
+.photo { position: relative; order: 2; width: 100%; aspect-ratio: 10 / 13; margin: 44px 0 0; overflow: hidden; }
+.overlay { position: absolute; inset: 0; z-index: 1; background: #d6cfc5; visibility: hidden; }
+.media { position: absolute; inset: 0; z-index: 2; }
+.img { object-fit: cover; }
+.side { display: contents; }
+.text { order: 1; font-size: 19px; line-height: 1.38; letter-spacing: -.01em; }
+.hobby { color: #a8a097; transition: color .3s ease-out; outline-offset: 2px; }
+.hobby:hover, .hobby:focus-visible, .hobby[data-active] { color: var(--ink); }
+.frame { display: none; }
+.bottom {
+  order: 3;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 28px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.email { text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+
+@media (min-width: 768px) {
+  .beyond { display: grid; grid-template-columns: 46% minmax(0, 1fr); }
+  .beyond[data-panel][data-bleed] { padding-left: var(--rail); }
+  .photo, .text, .frame, .bottom { order: 0; }
+  .photo { height: 100%; margin: 0; aspect-ratio: auto; }
+  .side { display: flex; flex-direction: column; justify-content: space-between; padding: var(--vg) var(--vg) var(--vg) calc(4.4 * var(--s)); }
+  .text { max-width: calc(40 * var(--s)); font-size: calc(2.1 * var(--s)); line-height: 1.36; }
+  .hobby { cursor: default; }
+  .frame {
+    position: relative;
+    display: block;
+    align-self: center;
+    width: calc(13.6 * var(--s));
+    aspect-ratio: 4 / 5;
+    border: 1px solid var(--line-strong);
+    background: linear-gradient(to top right, transparent calc(50% - .6px), var(--line-strong) calc(50% - .5px), var(--line-strong) calc(50% + .5px), transparent calc(50% + .6px));
+    overflow: hidden;
+  }
+  .hobbyImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; clip-path: inset(100% 0 0 0); }
+  .bottom { margin: 0; font-size: max(13px, calc(1.1 * var(--s))); }
+}

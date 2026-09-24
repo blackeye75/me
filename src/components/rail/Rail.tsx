@@ -4,16 +4,19 @@ import styles from './Rail.module.css';
 type Props = {
   profile: Profile;
   year: number;
+  /** On the home page the name scrolls back to the start; elsewhere it links home. */
+  home: boolean;
 };
 
 /** The site's navigation rail: menu toggle, running titles and scroll progress. */
-export function Rail({ profile, year }: Props) {
+export function Rail({ profile, year, home }: Props) {
+  const toStart = home ? { href: '#top', 'data-goto': 'top' } : { href: '/' };
   return (
     <header className={styles.rail} data-rail>
       <span className={styles.progress} data-progress aria-hidden="true" />
       <span className={styles.tip} data-progress-tip aria-hidden="true" />
-      <a className={styles.logo} href="#top" data-goto="top" aria-label={`${profile.name}, back to the start`}>
-        {profile.monogram}
+      <a className={styles.logo} {...toStart} aria-label={home ? `${profile.name}, back to the start` : `${profile.name}, home`}>
+        {profile.monogram}<sup aria-hidden="true">™</sup>
       </a>
       <button className={styles.menuButton} type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu" data-menu-btn>
         <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
@@ -24,7 +27,7 @@ export function Rail({ profile, year }: Props) {
       </button>
       <div className={styles.meta}>
         <p className={styles.edition}>{profile.edition}</p>
-        <a className={styles.name} href="#top" data-goto="top">{profile.name}°</a>
+        <a className={styles.name} {...toStart}>{profile.name}°</a>
         <p className={styles.year}>© {year}</p>
       </div>
     </header>

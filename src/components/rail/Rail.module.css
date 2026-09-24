@@ -11,7 +11,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: env(safe-area-inset-top, 0px) 10px 0 20px;
+  padding: env(safe-area-inset-top, 0px) 18px 0 20px;
   background: var(--rail-bg);
   color: var(--rail-fg);
   border-bottom: 1px solid var(--rail-line);
@@ -19,9 +19,10 @@
 }
 .rail :focus-visible { outline-color: currentColor; outline-offset: -4px; }
 
-.logo { font: 400 22px/1 var(--serif); letter-spacing: .02em; text-decoration: none; }
-.menuButton { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; }
-.menuButton svg { display: block; width: 28px; height: 28px; }
+.logo { display: flex; align-items: flex-start; font: 400 31px/1 var(--serif); letter-spacing: -.01em; text-decoration: none; }
+.logo sup { margin-left: 3px; font: 400 9px/1 var(--sans); }
+.menuButton { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-right: -2px; }
+.menuButton svg { display: block; width: 32px; height: 32px; }
 .meta { display: none; }
 
 .progress {

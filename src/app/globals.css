@@ -34,7 +34,7 @@
 
   --s: calc(100vw / 39);
   --vg: 20px;
-  --bar: 56px;
+  --bar: 64px;
   --rail: 0px;
 
   color-scheme: light;
@@ -57,8 +57,8 @@ html { -webkit-text-size-adjust: 100%; background: var(--hero-bg); scrollbar-wid
 html::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-/* Locks set by the intro, the menu and the case studies */
-.is-intro, .menu-open, .case-open { overflow: hidden; }
+/* Locks set by the intro and the menu */
+.is-intro, .menu-open { overflow: hidden; }
 
 body {
   margin: 0;
@@ -125,7 +125,11 @@ code { font-family: var(--mono); font-size: .9em; }
 .motion [data-reveal],
 .motion [data-about-part],
 .motion [data-rise],
-.motion [data-ft-line] { opacity: 0; }
+.motion [data-ft-line],
+.motion [data-fade],
+.motion [data-enter],
+.motion [data-enter-line],
+.motion [data-enter-rows] > * { opacity: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }

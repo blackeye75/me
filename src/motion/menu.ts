@@ -5,11 +5,8 @@ import type { Scroll } from './scroll';
 
 const MENU_TONE = { bg: '#2e2b28', fg: '#f3eee8', line: '#5a524d' };
 
-/** Which menu entry to highlight for the panel under the rail. */
-const NAV_FOR: Record<string, string> = {
-  top: 'top', about: 'about', 'the-work': 'work', work: 'work',
-  services: 'experience', experience: 'experience', darkroom: 'experience', contact: 'contact',
-};
+/** On the home page, the menu entry to highlight for the panel under the rail. */
+const HOME_NAV_FOR: Record<string, string> = { contact: '/#contact' };
 
 /**
  * Full-screen menu. The panel wipes open from left to right and the links rise
@@ -52,8 +49,11 @@ export function createMenu({ dispose, motion, reduce, scroll, rail, targetY }: {
 
   if (!button || !menu || !panel) return { bars, isOpen: () => false, close: (after?: () => void) => after?.() };
 
+  // Other pages mark their entry when rendered; the home page follows the scroll.
+  const home = window.location.pathname === '/';
   const markActive = () => {
-    const current = NAV_FOR[rail.current?.id ?? 'top'] ?? 'top';
+    if (!home) return;
+    const current = HOME_NAV_FOR[rail.current?.id ?? 'top'] ?? '/';
     items.forEach((it) => it.toggleAttribute('data-active', it.dataset.menuItem === current));
   };
 
@@ -116,7 +116,8 @@ export function createMenu({ dispose, motion, reduce, scroll, rail, targetY }: {
     if ((e as KeyboardEvent).key === 'Escape' && open) closeMenu(() => button.focus({ preventScroll: true }));
   });
 
-  // Any link with data-goto scrolls to its section, closing the menu first.
+  // Any link with data-goto scrolls to its section on this page, closing the menu first.
+  // Links to other pages are handled by the page transitions.
   $$('[data-goto]').forEach((link) => {
     dispose.on(link, 'click', (e) => {
       e.preventDefault();

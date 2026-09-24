@@ -1,3 +1,4 @@
+import { aboutPage, worksPage } from './pages';
 import { intro, nav, profile } from './profile';
 import { projects } from './projects';
 import { about, darkroom, experience, footer, services, work } from './sections';
@@ -15,6 +16,8 @@ export const localContent: SiteContent = {
   experience,
   darkroom,
   footer,
+  aboutPage,
+  worksPage,
 };
 
 export type * from './types';

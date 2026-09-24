@@ -1,105 +1,110 @@
-import type { Project } from '@/content';
-import { Cover } from '../cover/Cover';
+import Image from 'next/image';
+import type { Image as ImageData, Project, WorksPage } from '@/content';
 import { CodeBlock } from './CodeBlock';
 import styles from './CaseStudy.module.css';
 
 type Props = {
   project: Project;
-  index: number;
-  total: number;
   next: Project;
+  labels: WorksPage['labels'];
 };
 
-const pad = (n: number) => String(n).padStart(2, '0');
-
-/** A full-screen case study. Opened by the motion layer when a link with `data-case` is used. */
-export function CaseStudy({ project, index, total, next }: Props) {
-  const study = project.caseStudy;
-  const titleId = `${project.slug}-title`;
-
+function Picture({ image, sizes, tall }: { image: ImageData; sizes: string; tall?: boolean }) {
   return (
-    <dialog className={styles.case} id={project.slug} aria-labelledby={titleId} data-case-dialog data-lenis-prevent>
-      <div className={styles.scroll} data-case-scroll>
-        <div className={styles.bar}>
-          <button className={styles.back} type="button" data-close>← Back</button>
-          <span className={styles.pos}>{pad(index + 1)} / {pad(total)}</span>
-        </div>
-        <article>
-          <header className={`${styles.head} ${styles.wrap}`}>
-            <p className="eyebrow">{project.category} — {project.year}</p>
-            <h2 className={styles.title} id={titleId}>{project.name}</h2>
-            <p className={styles.lead}>{study.overview}</p>
-          </header>
-          <dl className={`${styles.meta} ${styles.wrap}`}>
-            <div><dt>Client</dt><dd>{study.client}</dd></div>
-            <div><dt>Role</dt><dd>{study.role}</dd></div>
-            <div><dt>Year</dt><dd>{project.year}</dd></div>
-            <div><dt>Stack</dt><dd>{study.stack}</dd></div>
-            <div>
-              <dt>Links</dt>
-              <dd className={styles.links}>
-                {study.links.map((link) => (
-                  <a key={link.href + link.label} href={link.href} target="_blank" rel="noopener">{link.label}</a>
-                ))}
-                <span className={styles.status} data-status={project.status}>{project.statusLabel}</span>
-              </dd>
-            </div>
-          </dl>
-          <div className={`${styles.coverWrap} ${styles.wrap}`}>
-            <Cover cover={project.cover} className={styles.fill} />
-          </div>
-          <div className={`${styles.body} ${styles.wrap}`}>
-            <section className={styles.sec}>
-              <h3>The problem</h3>
-              <div><p>{study.problem}</p></div>
-            </section>
-            <section className={styles.sec}>
-              <h3>Approach</h3>
-              <div><p>{study.approach}</p></div>
-            </section>
-            <section className={styles.sec}>
-              <h3>Key decisions</h3>
-              <div>
-                <ul className={styles.decisions}>
-                  {study.decisions.map((d) => (
-                    <li key={d.title}><strong>{d.title}</strong> {d.body}</li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-            <section className={styles.sec}>
-              <h3>In the code</h3>
-              <div><CodeBlock code={study.code} /></div>
-            </section>
-            <section className={styles.sec}>
-              <h3>Outcome</h3>
-              <div>
-                <dl className={styles.metrics}>
-                  {study.metrics.map((m) => (
-                    <div key={m.label}><dt>{m.label}</dt><dd>{m.value}</dd></div>
-                  ))}
-                </dl>
-                <p>{study.outcome}</p>
-              </div>
-            </section>
-          </div>
-        </article>
-        <button className={styles.next} type="button" data-open={next.slug}>
-          <span className="eyebrow">Next project</span>
-          <span className={styles.nextTitle}>{next.name} <span aria-hidden="true">→</span></span>
-        </button>
-      </div>
-    </dialog>
+    <figure className={tall ? `${styles.pic} ${styles.tall}` : styles.pic} data-image-reveal>
+      <span className={styles.overlay} data-ir-overlay />
+      <span className={styles.media} data-ir-media>
+        <Image src={image.src} alt={image.alt} fill sizes={sizes} className={styles.img} />
+      </span>
+    </figure>
   );
 }
 
-/** Every case study, each linking to the next in a loop. */
-export function CaseStudies({ projects }: { projects: Project[] }) {
+/**
+ * A project page. Desktop: the facts stay on the left while the pictures and the
+ * write-up scroll past on the right. Phones: everything in one column.
+ */
+export function CaseStudy({ project, next, labels }: Props) {
+  const study = project.caseStudy;
+  const gallerySizes = '(min-width: 768px) 50vw, 100vw';
+
   return (
-    <>
-      {projects.map((project, i) => (
-        <CaseStudy key={project.slug} project={project} index={i} total={projects.length} next={projects[(i + 1) % projects.length]} />
-      ))}
-    </>
+    <article className={styles.page} aria-labelledby="case-title" data-panel data-rail-bg="#faf9f6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac">
+      <div className={styles.info}>
+        <div className={styles.top}>
+          <a className={styles.back} href="/works" data-enter><span aria-hidden="true">←</span> {labels.back}</a>
+          <h1 className={styles.title} id="case-title">
+            <span className="mask"><span className={styles.line} data-enter-line>{project.name}</span></span>
+          </h1>
+        </div>
+        <div className={styles.facts}>
+          <div className={styles.fact}>
+            <h2 className="label" data-enter>{labels.overview}</h2>
+            <p className={styles.overview} data-enter>{study.overview}</p>
+          </div>
+          <div className={styles.fact}>
+            <h2 className="label" data-enter>{labels.details}</h2>
+            <dl className={styles.details} data-enter-rows>
+              <div><dt>{labels.client}</dt><dd>{study.client}</dd></div>
+              <div><dt>{labels.year}</dt><dd>{project.year}</dd></div>
+              <div><dt>{labels.role}</dt><dd>{study.role}</dd></div>
+              <div><dt>{labels.stack}</dt><dd>{study.stack}</dd></div>
+              <div>
+                <dt>{labels.preview}</dt>
+                <dd className={styles.links}>
+                  {study.links.map((link) => (
+                    <a key={link.href + link.label} href={link.href} target="_blank" rel="noopener">{link.label}</a>
+                  ))}
+                  <span className={styles.status} data-status={project.status}>{project.statusLabel}</span>
+                </dd>
+              </div>
+            </dl>
+          </div>
+          <div className={`${styles.fact} ${styles.nextFact}`}>
+            <h2 className="label" data-enter>{labels.next}</h2>
+            <a className={styles.nextName} href={`/works/${next.slug}`} data-enter>{next.name}</a>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.gallery}>
+        <Picture image={project.images.hero} sizes={gallerySizes} />
+        <section className={styles.sec}>
+          <h2 data-reveal>{labels.problem}</h2>
+          <p data-reveal>{study.problem}</p>
+        </section>
+        <section className={styles.sec}>
+          <h2 data-reveal>{labels.approach}</h2>
+          <p data-reveal>{study.approach}</p>
+        </section>
+        <Picture image={project.images.detail} sizes={gallerySizes} />
+        <section className={styles.sec}>
+          <h2 data-reveal>{labels.decisions}</h2>
+          <ul className={styles.decisions}>
+            {study.decisions.map((d) => (
+              <li key={d.title} data-reveal><strong>{d.title}</strong> {d.body}</li>
+            ))}
+          </ul>
+        </section>
+        <section className={styles.sec}>
+          <h2 data-reveal>{labels.code}</h2>
+          <div data-fade><CodeBlock code={study.code} /></div>
+        </section>
+        <Picture image={project.images.tall} sizes={gallerySizes} tall />
+        <section className={styles.sec}>
+          <h2 data-reveal>{labels.outcome}</h2>
+          <dl className={styles.metrics}>
+            {study.metrics.map((m) => (
+              <div key={m.label} data-fade><dt>{m.label}</dt><dd>{m.value}</dd></div>
+            ))}
+          </dl>
+          <p data-reveal>{study.outcome}</p>
+        </section>
+        <a className={styles.next} href={`/works/${next.slug}`}>
+          <span className="label">{labels.next}</span>
+          <span className={styles.nextTitle}>{next.name} <span aria-hidden="true">→</span></span>
+        </a>
+      </div>
+    </article>
   );
 }

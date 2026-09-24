@@ -185,7 +185,7 @@ export function createStory({ reduce, scroll, workWindow, darkroom }: {
       const held = pauses.reduce((sum, p) => (left > p.at ? sum + p.len : sum), 0);
       return trigger.start + left + held;
     }
-    return el.getBoundingClientRect().top + window.scrollY - (isDesktop() ? 0 : 56);
+    return el.getBoundingClientRect().top + window.scrollY - (isDesktop() ? 0 : ($('[data-rail]')?.offsetHeight ?? 64));
   };
 
   return {

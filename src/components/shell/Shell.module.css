@@ -1,0 +1,13 @@
+/* The curtain covers the page while one page hands over to the next. It only
+   shows while the motion script runs, so it can never hide the page on its own. */
+
+.curtain {
+  position: fixed;
+  z-index: 90;
+  inset: 0;
+  background: var(--hero-bg);
+  visibility: hidden;
+  pointer-events: none;
+}
+:global(.motion.is-entering) .curtain,
+:global(.motion.is-leaving) .curtain { visibility: visible; }

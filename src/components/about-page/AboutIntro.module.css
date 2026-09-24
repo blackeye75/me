@@ -1,0 +1,47 @@
+/* About, first panel. Phones: name, introduction, then the portrait. */
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+@media (max-width: 767px) {
+  .intro[data-panel] { padding-top: calc(var(--bar) + 24px); }
+}
+.name {
+  order: 1;
+  font: 400 18.5vw/.86 var(--serif);
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+}
+.line { display: block; }
+.copy { order: 2; display: grid; gap: 16px; margin-top: 44px; }
+.text { max-width: 36ch; font-size: 17px; line-height: 1.4; }
+.photo { order: 3; position: relative; width: 100%; aspect-ratio: 4 / 5; margin: 44px 0 0; overflow: hidden; }
+.overlay { position: absolute; inset: 0; z-index: 1; background: #dcd5cb; visibility: hidden; }
+.media { position: absolute; inset: 0; z-index: 2; }
+
+@media (min-width: 768px) {
+  .intro { display: block; padding: 0; }
+  .photo { position: absolute; top: 0; bottom: 0; left: var(--rail); width: 44%; margin: 0; aspect-ratio: auto; }
+  .name {
+    position: absolute;
+    top: var(--vg);
+    left: calc(var(--rail) + 44% + 4.4 * var(--s));
+    right: var(--vg);
+    font-size: calc(15 * var(--s));
+  }
+  .copy {
+    position: absolute;
+    left: calc(var(--rail) + 44% + 4.4 * var(--s));
+    right: var(--vg);
+    bottom: var(--vg);
+    grid-template-columns: calc(14.6 * var(--s)) minmax(0, 1fr);
+    align-items: start;
+    gap: 0;
+    margin: 0;
+  }
+  .copy :global(.label) { padding-top: .5em; }
+  .text { max-width: calc(29 * var(--s)); font-size: calc(1.55 * var(--s)); line-height: 1.38; }
+}
