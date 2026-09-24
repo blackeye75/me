@@ -87,7 +87,7 @@ export function initWorkHover({ dispose, reduce, rail, isMenuOpen }: { dispose: 
 
 /**
  * Chapter IV. Desktop: hovering a name fades the others (its logo tile is pure CSS).
- * Phones: the name crossing the middle of the screen is in focus and shows its logo.
+ * Phones: focus steps down the list as it scrolls past; the focused name shows its logo.
  */
 export function initExperience({ dispose }: { dispose: Disposer }) {
   const list = $('[data-clients-list]');
@@ -108,14 +108,16 @@ export function initExperience({ dispose }: { dispose: Disposer }) {
 
   const mm = gsap.matchMedia();
   mm.add(MOBILE, () => {
-    // The first row stays in focus until the list reaches the middle, the last one after it has passed.
-    const last = rows.length - 1;
-    const triggers = rows.map((row, i) => ScrollTrigger.create({
-      trigger: row,
-      start: i === 0 ? 'top bottom' : 'top 55%',
-      end: i === last ? 'bottom top' : 'bottom 55%',
-      onToggle: (self) => row.toggleAttribute('data-active', self.isActive),
-    }));
+    // As the list scrolls through the screen, focus steps down it one row at a
+    // time (and back up when scrolling back). The first row is in focus before.
+    const setActive = (index: number) => rows.forEach((r, j) => r.toggleAttribute('data-active', j === index));
+    setActive(0);
+    const triggers = [ScrollTrigger.create({
+      trigger: list,
+      start: 'top 70%',
+      end: 'bottom 35%',
+      onUpdate: (self) => setActive(Math.min(rows.length - 1, Math.floor(self.progress * rows.length))),
+    })];
     return () => {
       triggers.forEach((st) => st.kill());
       rows.forEach((r) => r.removeAttribute('data-active'));
@@ -124,7 +126,7 @@ export function initExperience({ dispose }: { dispose: Disposer }) {
   return () => mm.revert();
 }
 
-/** Chapter III: backgrounds wipe up on hover (desktop) or as each card scrolls in (phones). */
+/** Chapter III: backgrounds wipe up on hover (desktop), or show while their card is mid-screen (phones). */
 export function initServices({ reduce }: { reduce: boolean }) {
   const mm = gsap.matchMedia();
   const items = $$('[data-svc]');
@@ -168,7 +170,8 @@ export function initServices({ reduce }: { reduce: boolean }) {
     return () => cleanups.forEach((fn) => fn());
   });
 
-  // Phones: each picture wipes up as its card comes in, then drifts slower than the page.
+  // Phones: a card shows its picture only while it is in the middle of the screen.
+  // The picture fades in zooming out, and fades away zooming in as the card moves on.
   mm.add(MOBILE, () => {
     if (reduce) return undefined;
     const triggers: ScrollTrigger[] = [];
@@ -176,16 +179,28 @@ export function initServices({ reduce }: { reduce: boolean }) {
       const bg = $('[data-svc-bg]', svc);
       const media = $('[data-svc-media]', svc);
       if (!bg || !media) return;
-      const wipe = gsap.fromTo(bg, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none' });
-      const drift = gsap.fromTo(media, { yPercent: -8 }, { yPercent: 8, ease: 'none' });
-      triggers.push(
-        ScrollTrigger.create({ trigger: svc, start: 'top bottom', end: 'top 35%', scrub: true, animation: wipe }),
-        ScrollTrigger.create({ trigger: svc, start: 'top bottom', end: 'bottom top', scrub: true, animation: drift }),
-      );
+      gsap.set(bg, { autoAlpha: 0 });
+      gsap.set(media, { scale: 1.3 });
+      const show = () => {
+        gsap.to(bg, { autoAlpha: 1, duration: 0.9, ease: 'power2.out', overwrite: 'auto' });
+        gsap.fromTo(media, { scale: 1.3 }, { scale: 1, duration: 1.6, ease: 'power3.out', overwrite: 'auto' });
+      };
+      const hide = () => {
+        gsap.to(bg, { autoAlpha: 0, duration: 0.7, ease: 'power2.inOut', overwrite: 'auto' });
+        gsap.to(media, { scale: 1.15, duration: 0.8, ease: 'power2.inOut', overwrite: 'auto' });
+      };
+      triggers.push(ScrollTrigger.create({
+        trigger: svc,
+        start: 'center 75%',
+        end: 'center 20%',
+        onToggle: (self) => (self.isActive ? show() : hide()),
+      }));
     });
     return () => {
       triggers.forEach((st) => st.kill());
-      gsap.set(items.flatMap((svc) => [$('[data-svc-bg]', svc), $('[data-svc-media]', svc)]).filter(Boolean), { clearProps: 'all' });
+      const parts = items.flatMap((svc) => [$('[data-svc-bg]', svc), $('[data-svc-media]', svc)]).filter((el): el is HTMLElement => Boolean(el));
+      gsap.killTweensOf(parts);
+      if (parts.length) gsap.set(parts, { clearProps: 'all' });
     };
   });
 

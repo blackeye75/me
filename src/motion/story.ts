@@ -135,19 +135,21 @@ export function createStory({ reduce, scroll, workWindow, darkroom }: {
         darkroom.reset();
 
         // The panels sit in a flex column, where pin spacing is off by default; switch it on.
+        // These pins are rebuilt after other triggers exist, so they measure first
+        // (refreshPriority) and everything below accounts for their extra scroll.
         if (workWindow.ready) {
           const size = workWindow.measure(true);
           box.t = 0;
           workWindow.set(0, size);
           windowTl = gsap.timeline({ defaults: { ease: 'none' } })
             .fromTo(box, { t: 0 }, { t: 1, onUpdate: () => workWindow.set(box.t, size) });
-          windowTrigger = ScrollTrigger.create({ trigger: workWindow.panel, animation: windowTl, start: 'top top', end: `+=${size.H}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1 });
+          windowTrigger = ScrollTrigger.create({ trigger: workWindow.panel, animation: windowTl, start: 'top top', end: `+=${size.H}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1, refreshPriority: 1 });
         }
         if (darkroom.ready) {
           const len = darkroom.panel!.clientHeight * 1.6;
           darkroomTl = gsap.timeline({ defaults: { ease: 'none' } });
           darkroom.addTo(darkroomTl, 0, len);
-          darkroomTrigger = ScrollTrigger.create({ trigger: darkroom.panel, animation: darkroomTl, start: 'top top', end: `+=${len}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1 });
+          darkroomTrigger = ScrollTrigger.create({ trigger: darkroom.panel, animation: darkroomTl, start: 'top top', end: `+=${len}`, pin: true, pinSpacing: true, scrub: true, anticipatePin: 1, refreshPriority: 1 });
         }
       };
 

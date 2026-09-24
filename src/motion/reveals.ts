@@ -38,16 +38,45 @@ export function initReveals(storyTimeline: gsap.core.Timeline | null) {
     });
   };
 
-  // Home, Chapter I: label, intro and quote rise in sequence, then the portrait.
+  // Home, Chapter I. Desktop: label, intro and quote rise in sequence, then the portrait.
+  // Phones: the column is laid out without its wrapper box (display: contents),
+  // so each part reveals as it scrolls into view, and so does the portrait.
   const about = $('[data-about]');
   const aboutParts = $$('[data-about-part]');
   const portrait = about ? $('[data-image-reveal]', about) : null;
   if (portrait) prepImage(portrait);
-  whenSeen(about, () => {
-    const tl = gsap.timeline();
-    aboutParts.forEach((el, i) => tl.add(revealLines(el), i * 0.12));
-    if (portrait) tl.add(revealImage(portrait), aboutParts.length * 0.12);
-  });
+  if (about && storyTimeline) {
+    let done = false;
+    mm.add(DESKTOP, () => {
+      const st = ScrollTrigger.create({
+        trigger: about,
+        containerAnimation: storyTimeline,
+        start: 'left 80%',
+        once: true,
+        onEnter: () => {
+          if (done) return;
+          done = true;
+          const tl = gsap.timeline();
+          aboutParts.forEach((el, i) => tl.add(revealLines(el), i * 0.12));
+          if (portrait) tl.add(revealImage(portrait), aboutParts.length * 0.12);
+        },
+      });
+      return () => st.kill();
+    });
+    mm.add(MOBILE, () => {
+      const triggers = [...aboutParts, ...(portrait ? [portrait] : [])].map((el) => ScrollTrigger.create({
+        trigger: el,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          if (done) return;
+          if (el === portrait) revealImage(portrait, { duration: 1 });
+          else revealLines(el);
+        },
+      }));
+      return () => triggers.forEach((st) => st.kill());
+    });
+  }
 
   // Other pictures wipe in on their own (the page's lead picture is part of its entrance).
   $$('[data-image-reveal]:not([data-enter-image])').forEach((shell) => {
