@@ -158,6 +158,13 @@ export function Studio({ defaults, stored, email, name }: Props) {
           </header>
 
           <div className={styles.body} key={active}>
+            {section.related && (
+              <nav className={styles.related} aria-label="Related sections">
+                {section.related.map((r) => (
+                  <button key={r.key} type="button" className={`${styles.btn} ${styles.small}`} onClick={() => setActive(r.key)}>{r.label} →</button>
+                ))}
+              </nav>
+            )}
             {'list' in section
               ? (
                 <section className={styles.card}>

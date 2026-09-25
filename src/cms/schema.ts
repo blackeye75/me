@@ -36,6 +36,8 @@ export type Section = {
   title: string;
   group: string;
   description: string;
+  /** Other sections that edit the same part of the site, linked from the top of this one. */
+  related?: { key: SectionKey; label: string }[];
 } & ({ fields: Field[] } | { list: ListItem });
 
 const text = (key: string, label: string, hint?: string): Field => ({ kind: 'text', key, label, hint });
@@ -113,9 +115,10 @@ export const sections: Section[] = [
   },
   {
     key: 'work',
-    title: 'Chapter II · Work',
+    title: 'Chapter II · Heading & reel',
     group: 'Home page',
-    description: '"The Work" window, its reel and the project list heading.',
+    description: '"The Work" window and its video, and the words around the project list. The projects themselves are in Chapter II · Projects.',
+    related: [{ key: 'projects', label: 'Edit the projects in this chapter' }],
     fields: [
       { kind: 'group', key: 'intro', label: 'Window words', fields: [text('before', 'Left / top word'), text('after', 'Right / bottom word')] },
       {
@@ -135,6 +138,68 @@ export const sections: Section[] = [
       text('allLabel', 'Link to all work'),
     ],
   },
+  {
+    key: 'projects',
+    title: 'Chapter II · Projects',
+    group: 'Home page',
+    description: 'Every project: its name in the Chapter II list, its card on the works page and its full project page (pictures, overview, client, year, role, stack, links, problem, approach, decisions, code, results, outcome). Open a project to edit it; the order here is the order on the site.',
+    related: [
+      { key: 'work', label: 'Edit the chapter heading and reel' },
+      { key: 'worksPage', label: 'Edit the labels on project pages' },
+    ],
+    list: {
+      noun: 'project', titleKey: 'name',
+      fields: [
+        text('name', 'Name'),
+        text('slug', 'Page address', 'Lowercase words and hyphens; the page lives at /works/<address>.'),
+        text('category', 'Category'),
+        { kind: 'number', key: 'year', label: 'Year' },
+        { kind: 'select', key: 'status', label: 'Status', options: [{ value: 'live', label: 'Live' }, { value: 'oss', label: 'Open source' }, { value: 'archived', label: 'Archived' }] },
+        text('statusLabel', 'Status label'),
+        {
+          kind: 'group', key: 'images', label: 'Pictures',
+          fields: [
+            image('hero', 'Landscape', 'Lists and the top of the case study (16:10).'),
+            image('tall', 'Portrait', 'Tall cards on the works page (4:5).'),
+            image('detail', 'Close-up', 'Further down the case study (16:10).'),
+          ],
+        },
+        {
+          kind: 'group', key: 'caseStudy', label: 'Case study',
+          fields: [
+            para('overview', 'Overview'),
+            text('client', 'Client'),
+            text('role', 'Role'),
+            text('stack', 'Stack'),
+            { kind: 'list', key: 'links', label: 'Links', item: link },
+            para('problem', 'The problem', undefined, 4),
+            para('approach', 'Approach', undefined, 4),
+            {
+              kind: 'list', key: 'decisions', label: 'Key decisions',
+              item: { noun: 'decision', titleKey: 'title', fields: [text('title', 'Title'), para('body', 'Explanation')], empty: () => ({ title: '', body: '' }) },
+            },
+            { kind: 'text', key: 'code', label: 'Code excerpt', multiline: true, mono: true, rows: 8, hint: 'Line comments (// or --) are dimmed.' },
+            {
+              kind: 'list', key: 'metrics', label: 'Results',
+              item: { noun: 'result', titleKey: 'value', fields: [text('value', 'Figure', 'e.g. −38%'), text('label', 'What it measures')], empty: () => ({ value: '', label: '' }) },
+            },
+            para('outcome', 'Outcome', undefined, 4),
+          ],
+        },
+      ],
+      empty: () => ({
+        slug: 'new-project',
+        name: 'New project',
+        category: '',
+        year: new Date().getFullYear(),
+        status: 'live',
+        statusLabel: 'Live',
+        images: { hero: emptyImage(), tall: { ...emptyImage(), width: 1200, height: 1500 }, detail: emptyImage() },
+        caseStudy: { overview: '', client: '', role: '', stack: '', links: [], problem: '', approach: '', decisions: [], code: '', metrics: [], outcome: '' },
+      }),
+    },
+  },
+
   {
     key: 'services',
     title: 'Chapter III · Services',
@@ -208,65 +273,6 @@ export const sections: Section[] = [
       para('sign', 'Sign-off', 'Line breaks are kept.'),
       text('credit', 'Credit line'),
     ],
-  },
-
-  // ---------- Projects ----------
-  {
-    key: 'projects',
-    title: 'Projects',
-    group: 'Work',
-    description: 'Every project, with its pictures and full case study. The order here is the order on the site.',
-    list: {
-      noun: 'project', titleKey: 'name',
-      fields: [
-        text('name', 'Name'),
-        text('slug', 'Page address', 'Lowercase words and hyphens; the page lives at /works/<address>.'),
-        text('category', 'Category'),
-        { kind: 'number', key: 'year', label: 'Year' },
-        { kind: 'select', key: 'status', label: 'Status', options: [{ value: 'live', label: 'Live' }, { value: 'oss', label: 'Open source' }, { value: 'archived', label: 'Archived' }] },
-        text('statusLabel', 'Status label'),
-        {
-          kind: 'group', key: 'images', label: 'Pictures',
-          fields: [
-            image('hero', 'Landscape', 'Lists and the top of the case study (16:10).'),
-            image('tall', 'Portrait', 'Tall cards on the works page (4:5).'),
-            image('detail', 'Close-up', 'Further down the case study (16:10).'),
-          ],
-        },
-        {
-          kind: 'group', key: 'caseStudy', label: 'Case study',
-          fields: [
-            para('overview', 'Overview'),
-            text('client', 'Client'),
-            text('role', 'Role'),
-            text('stack', 'Stack'),
-            { kind: 'list', key: 'links', label: 'Links', item: link },
-            para('problem', 'The problem', undefined, 4),
-            para('approach', 'Approach', undefined, 4),
-            {
-              kind: 'list', key: 'decisions', label: 'Key decisions',
-              item: { noun: 'decision', titleKey: 'title', fields: [text('title', 'Title'), para('body', 'Explanation')], empty: () => ({ title: '', body: '' }) },
-            },
-            { kind: 'text', key: 'code', label: 'Code excerpt', multiline: true, mono: true, rows: 8, hint: 'Line comments (// or --) are dimmed.' },
-            {
-              kind: 'list', key: 'metrics', label: 'Results',
-              item: { noun: 'result', titleKey: 'value', fields: [text('value', 'Figure', 'e.g. −38%'), text('label', 'What it measures')], empty: () => ({ value: '', label: '' }) },
-            },
-            para('outcome', 'Outcome', undefined, 4),
-          ],
-        },
-      ],
-      empty: () => ({
-        slug: 'new-project',
-        name: 'New project',
-        category: '',
-        year: new Date().getFullYear(),
-        status: 'live',
-        statusLabel: 'Live',
-        images: { hero: emptyImage(), tall: { ...emptyImage(), width: 1200, height: 1500 }, detail: emptyImage() },
-        caseStudy: { overview: '', client: '', role: '', stack: '', links: [], problem: '', approach: '', decisions: [], code: '', metrics: [], outcome: '' },
-      }),
-    },
   },
 
   // ---------- Pages ----------
