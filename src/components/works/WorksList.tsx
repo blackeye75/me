@@ -7,7 +7,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
 /** All projects. On desktop the row of cards slides sideways as you scroll; on phones they stack. */
 export function WorksList({ page, projects }: { page: WorksPage; projects: Project[] }) {
   return (
-    <section className={styles.works} data-works data-panel data-rail-bg="#edeae6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac" aria-labelledby="works-title">
+    <section className={styles.works} data-works data-hold data-panel data-rail-bg="#edeae6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac" aria-labelledby="works-title">
       <header className={styles.head}>
         <h1 className={styles.title} id="works-title">
           <span className="mask"><span className={styles.line} data-enter-line>{page.title}</span></span>

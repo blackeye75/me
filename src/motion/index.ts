@@ -95,15 +95,19 @@ export function initMotion(): () => void {
       story.rebuild();
       ScrollTrigger.refresh();
 
-      // Arriving at a section of the home page from another page (/#contact).
-      // Runs once everything is measured, so nothing moves the page afterwards.
-      const jumpToHash = () => {
-        if (hash && document.getElementById(hash)) requestAnimationFrame(() => scroll.scrollTo(story.targetY(hash), { immediate: true }));
+      // Arriving at a section of the home page from another page (/#contact):
+      // jump there while the page is still covered, before any reveal is set
+      // up, so nothing plays or moves where the visitor can see it.
+      const target = hash && document.getElementById(hash) ? hash : '';
+      const jump = () => {
+        if (!target) return;
+        scroll.scrollTo(story.targetY(target), { immediate: true });
+        ScrollTrigger.update();
       };
 
       if (!motion) {
         $('[data-clients-list]')?.setAttribute('data-interactive', '');
-        jumpToHash();
+        jump();
         return;
       }
       if (root.classList.contains('is-intro')) {
@@ -119,11 +123,15 @@ export function initMotion(): () => void {
             rail.request();
           },
         });
+        cleanups.push(initReveals(hasStory ? story.timeline : null));
       } else {
-        transitions.enter(() => playEntrance());
+        jump();
+        cleanups.push(initReveals(hasStory ? story.timeline : null));
+        // Let the browser paint the final position under the cover, then lift it.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (!disposed) transitions.enter(() => playEntrance());
+        }));
       }
-      cleanups.push(initReveals(hasStory ? story.timeline : null));
-      jumpToHash();
     });
   });
 

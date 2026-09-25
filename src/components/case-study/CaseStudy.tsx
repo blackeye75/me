@@ -30,7 +30,7 @@ export function CaseStudy({ project, next, labels }: Props) {
 
   return (
     <article className={styles.page} aria-labelledby="case-title" data-panel data-rail-bg="#faf9f6" data-rail-fg="#2e2b28" data-rail-line="#b8b3ac">
-      <div className={styles.info}>
+      <div className={styles.info} data-hold>
         <div className={styles.top}>
           <a className={styles.back} href="/works" data-enter><span aria-hidden="true">←</span> {labels.back}</a>
           <h1 className={styles.title} id="case-title">

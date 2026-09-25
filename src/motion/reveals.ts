@@ -42,8 +42,12 @@ export function initReveals(storyTimeline: gsap.core.Timeline | null) {
   /** Every watched element and whether it is currently revealed. */
   const watched = new Map<Element, { shown: () => boolean; show: () => void }>();
 
-  const watch = (trigger: Element | null, reveal: Reveal, { hStart = 'left 80%', vStart = 'top 80%', shown = false, media }: WatchOptions = {}) => {
+  const watch = (trigger: Element | null, reveal: Reveal, { hStart = 'left 80%', vStart = 'top 80%', shown = false, media: only }: WatchOptions = {}) => {
     if (!trigger) return;
+    // Parts that stay on screen while the page scrolls on desktop (the pinned works
+    // page, the sticky facts of a project page) never leave the screen there, so
+    // they only replay on phones, where they scroll like everything else.
+    const media = only ?? (trigger.closest('[data-hold]') ? MOBILE : undefined);
     let visible = shown;
     let anim: gsap.core.Animation | void;
     const show = () => {
