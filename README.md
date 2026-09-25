@@ -119,7 +119,7 @@ Each section is one row in a `content` table, stored as JSON. Anyone can read it
 **Setting it up**
 
 1. Create a project at [supabase.com](https://supabase.com).
-2. In its SQL editor, run `supabase/migrations/20260924000000_cms.sql`. This creates the tables, the security rules and the `media` bucket.
+2. In its SQL editor, run the files in `supabase/migrations`, oldest first. They create the tables, the security rules and the `media` bucket.
 3. Under **Authentication → Users**, add a user with your email and a password.
 4. Allow that email to edit, in the SQL editor:
    ```sql

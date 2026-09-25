@@ -20,7 +20,7 @@ export default async function Admin() {
       <Notice title="Connect Supabase" name={name}>
         <p>The admin panel stores content in Supabase. To switch it on:</p>
         <ol>
-          <li>Create a Supabase project and run <code>supabase/migrations/20260924000000_cms.sql</code> in its SQL editor.</li>
+          <li>Create a Supabase project and run the files in <code>supabase/migrations</code>, oldest first, in its SQL editor.</li>
           <li>Create your user under Authentication → Users, then add your email: <code>insert into public.admins (email) values (&apos;you@example.com&apos;);</code></li>
           <li>Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> (Project Settings → API), locally in <code>.env.local</code> and in Vercel, then redeploy.</li>
         </ol>
